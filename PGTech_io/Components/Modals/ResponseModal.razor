@@ -1,0 +1,156 @@
+@page "/responseModal"
+@using PGTech_io.Components.UI_Model
+@using PGTech_io.Controllers
+@using PGTech_io.DTO
+@using PGTech_io.Models
+@rendermode InteractiveServer
+@inject ResponseController ResponseController;
+@inject SolicitationController SolicitationController
+
+<Modal @ref="modalRef" Title="@titleString" IsVerticallyCentered="true" Size="ModalSize.Large">
+    <BodyTemplate>
+        <EditForm Model="@Response" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+            <div class="input_box">
+                <label for="username">Usuario</label>
+            <!--<InputText Value="someValue" id="username" placeholder="Admin" readonly />-->
+            </div>
+
+            <div class="input_box">
+                <label for="problemDescription">Solucion del Problema</label>
+                <InputTextArea type="problemDescription" @bind-Value="Response.ProblemSolutionProperty" id="problemDescription"/>
+            </div>
+
+            <label for="document">Input Response Documents:</label>
+            <input type="file" id="document" name="document"
+                   accept="image/png, image/jpeg, .doc,.docx,.xml,
+                application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                   multiple/>
+
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Cerrar</Button>
+        <Button Color="ButtonColor.Primary" @onclick="SelectOperation">@defineStatus</Button>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal? modalRef;
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsUpdate { get; set; }
+    [Parameter] public EventCallback OnOperationCompleted { get; set; }
+    [Parameter] public Solicitation? Solicit { get; set; } = new();
+    
+    UserDTO userDto { get; set; } = new();
+    Response? Response { get; set; } = new();
+    private int selectedId = 0;
+    private bool isLoaded;
+    private bool hasOperated = false;
+    private string defineStatus = "";
+    private string titleString = "";
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    public async Task OnShowResponseModalClick(ModalParameters modalParameters)
+    {
+        IsVisible = modalParameters.isVisible;
+        IsUpdate = modalParameters.isUpdate;
+        Solicit = modalParameters.messageType as Solicitation;
+        
+        if (IsVisible)
+        {
+            isLoaded = !isLoaded;
+
+            defineStatus = IsUpdate ? "Update" : "Guardar";
+            
+            if (Solicit != null)
+            {
+                titleString = $"{Solicit.ClientProperty} {defineStatus}"; //Add User later
+                saveId();
+            }
+            
+            await OnHideModalClick();
+            await modalRef?.ShowAsync();
+        }
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modalRef?.HideAsync(); 
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private void saveId()
+    {
+        selectedId = Response.IdProperty;
+    }
+
+    private async Task SelectOperation()
+    {
+        Console.WriteLine("IsUpdate:" + IsUpdate);
+    
+        if (IsUpdate)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
+        
+        await ReturnTask();
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    private async Task Create() //Move to Validations
+    {
+        //if (!ValidateData()) return;
+
+        if (Solicit == null || Response == null) return;
+        
+        var response = await ResponseController.Post(Response, Solicit.IdProperty);
+        
+        if (response)
+        {
+            Console.WriteLine("Solicitation sent!");
+        }
+    }
+    
+
+    private async Task Update()
+    {
+        //if (!ValidateData()) return;
+        
+        if (Solicit == null || selectedId == 0) return;
+
+        var response = await ResponseController.Put(Response, selectedId);
+
+        if (response)
+        {
+            Console.WriteLine("Solicitation updated!");
+        }
+    }
+    
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private async Task ReturnTask()
+    {
+        //await OnOperationCompleted.InvokeAsync();
+        //StateHasChanged();
+        //await OnHideModalClick();
+    }
+
+    private bool ValidateData()
+    {
+        return true;
+    }
+}

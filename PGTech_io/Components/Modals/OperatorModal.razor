@@ -1,0 +1,205 @@
+@page "/operatorModal"
+@using PGTech_io.Components.UI_Model
+@using PGTech_io.Controllers
+@using PGTech_io.DTO
+@using PGTech_io.Models
+@rendermode InteractiveServer
+@inject SolicitationController SolicitationController;
+
+<Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
+    <BodyTemplate>
+        <EditForm Model="@Solicit" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+        <div class="input_box">
+            <label for="username">Usuario</label>
+            <!--<InputText Value="someValue" id="username" placeholder="Usuario" readonly />-->
+        </div>
+
+        <div class="input_box">
+            <label for="client">Cliente</label>
+            <InputText type="client" @bind-Value="Solicit.ClientProperty"  id="client" required />
+        </div>
+
+        <div class="input_box">
+            <label for="sectorA">SectorA</label>
+            <InputText type="checkbox" @bind-Value="Solicit.SectorProperty"  id="sectorA" />
+            <label for="sectorB">SectorB</label>
+            <InputText type="checkbox" @bind-Value="Solicit.SectorProperty"  id="sectorB" />
+        </div>
+
+        <div class="input_box">
+            <tr>
+                <td>
+                    <label for="subsector1">Subsector A1</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector1"/>
+                </td>
+                <td>
+                    <label for="subsector2">Subsector A2</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector2"/>
+                </td>
+                <td>
+                    <label for="subsector3">Subsector A3</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector3"/>
+                </td>
+                <td>
+                    <label for="subsector4">Subsector A4</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector4"/>
+                </td>
+            </tr>
+        </div>
+        
+        <div class="input_box">
+            <tr>
+                <td>
+                    <label for="subsector5">Subsector B1</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector5"/>
+                </td>
+                <td>
+                    <label for="subsector6">Subsector B2</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector6"/>
+                </td>
+                <td>
+                    <label for="subsector7">Subsector B3</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector7"/>
+                </td>
+                <td>
+                    <label for="subsector8">Subsector B4</label>
+                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector8"/>
+                </td>
+            </tr>
+        </div>
+        
+        <div class="input_box">
+            <label for="OtroSubsector">Otro</label>
+            <InputText type="OtroSubsector" @bind-Value="Solicit.SubsectorProperty" id="OtroSubsector" />
+        </div>
+
+        <div class="input_box">
+            <label for="problemDescription">Description del Problema</label>
+            <InputTextArea type="problemDescription" @bind-Value="Solicit.ProblemDescriptionProperty" id="problemDescription" />
+        </div>
+        
+        <label for="document">Input Solicitation Documents:</label>
+        <input type="file" id="document" name="document" 
+               accept="image/png, image/jpeg, .doc,.docx,.xml,
+                application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+               multiple />
+        
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Cerrar</Button>
+        <Button Color="ButtonColor.Primary" @onclick="SelectOperation">@defineStatus</Button>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal? modalRef;
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsUpdate { get; set; }
+    [Parameter] public EventCallback OnOperationCompleted { get; set; }
+    [Parameter] public Solicitation? Solicit { get; set; } = new();
+    UserDTO userDto { get; set; } = new();
+    private int selectedId = 0;
+    private bool isLoaded;
+    private bool hasOperated = false;
+    private string defineStatus = "";
+    
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    public async Task OnShowOperatorModalClick(ModalParameters modalParameters)
+    {
+        IsUpdate = modalParameters.isUpdate;
+        Solicit = modalParameters.messageType as Solicitation;
+        IsVisible = modalParameters.isVisible;
+        
+        if (IsVisible)
+        {
+            isLoaded = !isLoaded;
+            if (Solicit != null) { saveId(); }
+            defineStatus = IsUpdate ? "Update" : "Guardar";
+            
+            await modalRef?.ShowAsync();
+        }
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modalRef?.HideAsync(); 
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private void saveId()
+    {
+        selectedId = Solicit.IdProperty;
+    }
+
+    private async Task SelectOperation()
+    {
+        Console.WriteLine("IsUpdate:" + IsUpdate);
+    
+        if (IsUpdate)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
+
+        await OnHideModalClick();
+        await ReturnTask();
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    private async Task Create() //Move to Validations
+    {
+        //if (!ValidateData()) return;
+        
+        if (Solicit == null) Solicit = new(); 
+        
+        var response = await SolicitationController.Post(Solicit);
+        
+        if (response)
+        {
+            Console.WriteLine("Solicitation sent!");
+        }
+    }
+    
+
+    private async Task Update()
+    {
+        //if (!ValidateData()) return;
+        
+        if (Solicit == null) return;
+
+        var response = await SolicitationController.Put(Solicit, selectedId);
+
+        if (response)
+        {
+            Console.WriteLine("Solicitation updated!");
+        }
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private async Task ReturnTask()
+    {
+        //await OnOperationCompleted.InvokeAsync();
+        //StateHasChanged();
+        //await OnHideModalClick();
+    }
+
+    private bool ValidateData()
+    {
+        return true;
+    }
+}

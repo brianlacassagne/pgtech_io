@@ -1,0 +1,28 @@
+﻿@page "/Requests"
+@using PGTech_io.Controllers
+@using PGTech_io.Models
+@attribute [StreamRendering]
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Grids
+@rendermode InteractiveServer
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@code {
+    bool isVisible { get; set; } = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            isVisible = true;
+    }
+}
