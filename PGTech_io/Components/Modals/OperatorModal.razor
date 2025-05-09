@@ -1,6 +1,7 @@
 @page "/operatorModal"
 @using PGTech_io.Components.UI_Model
 @using PGTech_io.Controllers
+@using PGTech_io.Domain.Enums
 @using PGTech_io.DTO
 @using PGTech_io.Models
 @rendermode InteractiveServer
@@ -8,7 +9,7 @@
 
 <Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
     <BodyTemplate>
-        <EditForm Model="@Solicit" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+        <EditForm Model="@SolicitParam" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
         <div class="input_box">
             <label for="username">Usuario</label>
             <!--<InputText Value="someValue" id="username" placeholder="Usuario" readonly />-->
@@ -16,66 +17,46 @@
 
         <div class="input_box">
             <label for="client">Cliente</label>
-            <InputText type="client" @bind-Value="Solicit.ClientProperty"  id="client" required />
+            <InputText type="client" @bind-Value="SolicitParam.Client"  id="client" required />
         </div>
 
         <div class="input_box">
             <label for="sectorA">SectorA</label>
-            <InputText type="checkbox" @bind-Value="Solicit.SectorProperty"  id="sectorA" />
+            <InputText type="checkbox" @bind-Value="SolicitParam.Sector"  id="sectorA" />
             <label for="sectorB">SectorB</label>
-            <InputText type="checkbox" @bind-Value="Solicit.SectorProperty"  id="sectorB" />
+            <InputText type="checkbox" @bind-Value="SolicitParam.Subsector"  id="sectorB" />
         </div>
 
         <div class="input_box">
             <tr>
-                <td>
-                    <label for="subsector1">Subsector A1</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector1"/>
-                </td>
-                <td>
-                    <label for="subsector2">Subsector A2</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector2"/>
-                </td>
-                <td>
-                    <label for="subsector3">Subsector A3</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector3"/>
-                </td>
-                <td>
-                    <label for="subsector4">Subsector A4</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector4"/>
-                </td>
+                <InputRadioGroup @bind-Value="SolicitParam.Subsector">
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestA1"/> Subsector A1</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestB1"/> Subsector A2</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestC1"/> Subsector A3</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestD1"/> Subsector A4</td>
+                </InputRadioGroup>
             </tr>
         </div>
         
         <div class="input_box">
             <tr>
-                <td>
-                    <label for="subsector5">Subsector B1</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector5"/>
-                </td>
-                <td>
-                    <label for="subsector6">Subsector B2</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector6"/>
-                </td>
-                <td>
-                    <label for="subsector7">Subsector B3</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector7"/>
-                </td>
-                <td>
-                    <label for="subsector8">Subsector B4</label>
-                    <InputText type="radio" @bind-Value="Solicit.SubsectorProperty" id="subsector8"/>
-                </td>
+                <InputRadioGroup @bind-Value="SolicitParam.Subsector">
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A1</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A2</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestC2"/> Subsector A3</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestD2"/> Subsector A4</td>
+                </InputRadioGroup>
             </tr>
         </div>
         
         <div class="input_box">
             <label for="OtroSubsector">Otro</label>
-            <InputText type="OtroSubsector" @bind-Value="Solicit.SubsectorProperty" id="OtroSubsector" />
+            <InputText type="OtroSubsector" @bind-Value="SolicitParam.Subsector" id="OtroSubsector" />
         </div>
 
         <div class="input_box">
             <label for="problemDescription">Description del Problema</label>
-            <InputTextArea type="problemDescription" @bind-Value="Solicit.ProblemDescriptionProperty" id="problemDescription" />
+            <InputTextArea type="problemDescription" @bind-Value="SolicitParam.Problemdescription" id="problemDescription" />
         </div>
         
         <label for="document">Input Solicitation Documents:</label>
@@ -90,6 +71,7 @@
         <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Cerrar</Button>
         <Button Color="ButtonColor.Primary" @onclick="SelectOperation">@defineStatus</Button>
     </FooterTemplate>
+    
 </Modal>
 
 @code {
@@ -97,26 +79,25 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
     [Parameter] public EventCallback OnOperationCompleted { get; set; }
-    [Parameter] public Solicitation? Solicit { get; set; } = new();
+    [Parameter] public Solicit? SolicitParam { get; set; } = new();
+
     UserDTO userDto { get; set; } = new();
     private int selectedId = 0;
     private bool isLoaded;
-    private bool hasOperated = false;
     private string defineStatus = "";
-    
     
     //------------------------------------------------------------------------------------------------------------------
 
     public async Task OnShowOperatorModalClick(ModalParameters modalParameters)
     {
         IsUpdate = modalParameters.isUpdate;
-        Solicit = modalParameters.messageType as Solicitation;
+        SolicitParam = modalParameters.messageType as Solicit;
         IsVisible = modalParameters.isVisible;
         
         if (IsVisible)
         {
             isLoaded = !isLoaded;
-            if (Solicit != null) { saveId(); }
+            if (SolicitParam != null) { selectedSolicitId(); }
             defineStatus = IsUpdate ? "Update" : "Guardar";
             
             await modalRef?.ShowAsync();
@@ -136,9 +117,9 @@
     
     //------------------------------------------------------------------------------------------------------------------
 
-    private void saveId()
+    private void selectedSolicitId()
     {
-        selectedId = Solicit.IdProperty;
+        selectedId = SolicitParam.Id;
     }
 
     private async Task SelectOperation()
@@ -164,9 +145,9 @@
     {
         //if (!ValidateData()) return;
         
-        if (Solicit == null) Solicit = new(); 
+        if (SolicitParam == null) SolicitParam = new(); 
         
-        var response = await SolicitationController.Post(Solicit);
+        var response = await SolicitationController.Post(SolicitParam);
         
         if (response)
         {
@@ -179,9 +160,9 @@
     {
         //if (!ValidateData()) return;
         
-        if (Solicit == null) return;
+        if (SolicitParam == null) return;
 
-        var response = await SolicitationController.Put(Solicit, selectedId);
+        var response = await SolicitationController.Put(SolicitParam, selectedId);
 
         if (response)
         {
@@ -193,9 +174,8 @@
 
     private async Task ReturnTask()
     {
-        //await OnOperationCompleted.InvokeAsync();
-        //StateHasChanged();
-        //await OnHideModalClick();
+        await OnOperationCompleted.InvokeAsync();
+        await OnHideModalClick();
     }
 
     private bool ValidateData()

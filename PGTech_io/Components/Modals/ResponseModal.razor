@@ -9,15 +9,15 @@
 
 <Modal @ref="modalRef" Title="@titleString" IsVerticallyCentered="true" Size="ModalSize.Large">
     <BodyTemplate>
-        <EditForm Model="@Response" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+        <EditForm Model="@ExistingResponse" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
             <div class="input_box">
                 <label for="username">Usuario</label>
             <!--<InputText Value="someValue" id="username" placeholder="Admin" readonly />-->
             </div>
 
             <div class="input_box">
-                <label for="problemDescription">Solucion del Problema</label>
-                <InputTextArea type="problemDescription" @bind-Value="Response.ProblemSolutionProperty" id="problemDescription"/>
+                <label for="Solutiondescription">Solucion del Problema</label>
+                <InputTextArea type="Solutiondescription" @bind-Value="ExistingResponse.Solutiondescription" id="Solutiondescription"/>
             </div>
 
             <label for="document">Input Response Documents:</label>
@@ -39,10 +39,10 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
     [Parameter] public EventCallback OnOperationCompleted { get; set; }
-    [Parameter] public Solicitation? Solicit { get; set; } = new();
+    [Parameter] public Solicit? SolicitParam { get; set; } = new();
     
     UserDTO userDto { get; set; } = new();
-    Response? Response { get; set; } = new();
+    Response? ExistingResponse { get; set; } = new();
     private int selectedId = 0;
     private bool isLoaded;
     private bool hasOperated = false;
@@ -55,22 +55,33 @@
     {
         IsVisible = modalParameters.isVisible;
         IsUpdate = modalParameters.isUpdate;
-        Solicit = modalParameters.messageType as Solicitation;
+        SolicitParam = modalParameters.messageType as Solicit;
+        ExistingResponse = new();
         
         if (IsVisible)
         {
             isLoaded = !isLoaded;
-
-            defineStatus = IsUpdate ? "Update" : "Guardar";
             
-            if (Solicit != null)
+            if (SolicitParam != null)
             {
-                titleString = $"{Solicit.ClientProperty} {defineStatus}"; //Add User later
-                saveId();
+                await AssignPossibleResponse();
+                selectedId = SolicitParam.Id;
+                defineStatus = IsUpdate ? "Update" : "Guardar";
+                titleString = $"{SolicitParam.Client} {defineStatus}"; //Add User later
             }
-            
-            await OnHideModalClick();
             await modalRef?.ShowAsync();
+        }
+    }
+
+    private async Task AssignPossibleResponse()
+    {
+        var response = await ResponseController.GetBySolicitationId(selectedId);
+                 
+        if (response != null)
+        {
+            Console.WriteLine("Response for [" + SolicitParam.ToString()  + "] found, ID -> " + response.ToString());
+            ExistingResponse = response;
+            IsUpdate = true;
         }
     }
 
@@ -83,28 +94,21 @@
     
     protected override async Task OnInitializedAsync()
     {
+        
     }
     
     //------------------------------------------------------------------------------------------------------------------
-
-    private void saveId()
-    {
-        selectedId = Response.IdProperty;
-    }
 
     private async Task SelectOperation()
     {
         Console.WriteLine("IsUpdate:" + IsUpdate);
     
-        if (IsUpdate)
-        {
-            await Update();
-        }
-        else
-        {
-            await Create();
-        }
+        if (IsUpdate) await Update();
         
+        else await Create();
+
+        ExistingResponse = null;
+        await OnHideModalClick();
         await ReturnTask();
     }
     
@@ -114,13 +118,13 @@
     {
         //if (!ValidateData()) return;
 
-        if (Solicit == null || Response == null) return;
+        if (SolicitParam == null || ExistingResponse == null) return;
         
-        var response = await ResponseController.Post(Response, Solicit.IdProperty);
+        var response = await ResponseController.Post(ExistingResponse, SolicitParam.Id);
         
         if (response)
         {
-            Console.WriteLine("Solicitation sent!");
+            Console.WriteLine("Response sent!");
         }
     }
     
@@ -129,13 +133,13 @@
     {
         //if (!ValidateData()) return;
         
-        if (Solicit == null || selectedId == 0) return;
+        if (SolicitParam == null || ExistingResponse == null) return;
 
-        var response = await ResponseController.Put(Response, selectedId);
+        var response = await ResponseController.Put(ExistingResponse, ExistingResponse.Id);
 
         if (response)
         {
-            Console.WriteLine("Solicitation updated!");
+            Console.WriteLine("Response updated!");
         }
     }
     
@@ -144,9 +148,8 @@
 
     private async Task ReturnTask()
     {
-        //await OnOperationCompleted.InvokeAsync();
-        //StateHasChanged();
-        //await OnHideModalClick();
+        await OnOperationCompleted.InvokeAsync();
+        await OnHideModalClick();
     }
 
     private bool ValidateData()

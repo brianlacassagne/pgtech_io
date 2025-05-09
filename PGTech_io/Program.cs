@@ -8,8 +8,8 @@ using PGTech_io.Data;
 using PGTech_io.Interfaces;
 using PGTech_io.Mappers;
 using PGTech_io.Repository;
-using PGTech_io.Service;
-using Syncfusion.Blazor;
+using Microsoft.EntityFrameworkCore;
+using PGTech_io.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +22,7 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddBlazorBootstrap();
+var database = builder.Configuration.GetConnectionString("Database");
 
 builder.Services.AddAuthentication(options =>
     {
@@ -31,30 +31,29 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+builder.Services.AddDbContext<Context>(options => options.UseNpgsql(database));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<Context>()
     .AddSignInManager()
+    .AddRoleManager<RoleManager<IdentityRole>>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-builder.Services.AddSingleton<IDocumentation, DocumentationRepository>();
-builder.Services.AddSingleton<IResponse, ResponseRepository>();
-builder.Services.AddSingleton<ISolicitation, SolicitationRepository>();
+builder.Services.AddBlazorBootstrap();
 
-builder.Services.AddSingleton<FirestoreService>();
-builder.Services.AddSingleton<DocumentationController>();
-builder.Services.AddSingleton<ResponseController>();
-builder.Services.AddSingleton<SolicitationController>();
+builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddScoped<IDocumentation, DocumentationRepository>();
+builder.Services.AddScoped<IResponse, ResponseRepository>();
+builder.Services.AddScoped<ISolicitation, SolicitationRepository>();
+
+builder.Services.AddScoped<DocumentationController>();
+builder.Services.AddScoped<ResponseController>();
+builder.Services.AddScoped<SolicitationController>();
 
 builder.Services.AddAutoMapper(typeof(UserMapper));
-
-builder.Services.AddSyncfusionBlazor();
 
 var app = builder.Build();
 

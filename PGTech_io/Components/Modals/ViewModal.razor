@@ -1,0 +1,154 @@
+@page "/viewModal"
+@using PGTech_io.Components.UI_Model
+@using PGTech_io.Controllers
+@using PGTech_io.Domain.Enums
+@using PGTech_io.DTO
+@using PGTech_io.Models
+@rendermode InteractiveServer
+@inject ResponseController ResponseController;
+
+<Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
+    <BodyTemplate>
+        <EditForm Model="@ExistingSolicit" FormName="ViewModal">
+        <div class="input_box">
+            <label for="username">Usuario</label>
+            <!--<InputText Value="someValue" id="username" placeholder="Usuario" readonly />-->
+        </div>
+
+        <div class="input_box">
+            <label for="client">Cliente</label>
+            <InputText type="client" @bind-Value="ExistingSolicit.Client"  id="client" required readonly/>
+        </div>
+
+        <div class="input_box">
+            <label for="sectorA">SectorA</label>
+            <InputText type="checkbox" @bind-Value="ExistingSolicit.Sector"  id="sectorA" readonly/>
+            <label for="sectorB">SectorB</label>
+            <InputText type="checkbox" @bind-Value="ExistingSolicit.Sector"  id="sectorB" readonly/>
+        </div>
+
+        <div class="input_box">
+            <tr>
+                <InputRadioGroup @bind-Value="ExistingSolicit.Subsector">
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestA1"/> Subsector A1</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestB1"/> Subsector A2</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestC1"/> Subsector A3</td>
+                    <td><InputRadio Value="SubsectorEnums.Subsector.TestD1"/> Subsector A4</td>
+                </InputRadioGroup>
+            </tr>
+        </div>
+        
+        <div class="input_box">
+            <tr>
+                <InputRadioGroup @bind-Value="ExistingSolicit.Subsector">
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A1</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A2</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestC2"/> Subsector A3</td>
+                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestD2"/> Subsector A4</td>
+                </InputRadioGroup>
+            </tr>
+        </div>
+        
+        <div class="input_box">
+            <label for="OtroSubsector">Otro</label>
+            <InputText type="OtroSubsector" @bind-Value="ExistingSolicit.Subsector" id="OtroSubsector" readonly/>
+        </div>
+
+        <div class="input_box">
+            <label for="problemDescription">Description del Problema</label>
+            <InputTextArea type="problemDescription" @bind-Value="ExistingSolicit.Problemdescription" id="problemDescription" readonly/>
+        </div>
+        
+        <label for="document">Input Solicitation Documents:</label>
+        <input type="file" id="document" name="document" 
+               accept="image/png, image/jpeg, .doc,.docx,.xml,
+                application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+               multiple />
+        </EditForm>
+
+        <EditForm Model="@ExistingResponse" FormName="AdminModal">
+            <div class="input_box">
+                <label for="username">Usuario</label>
+                <!--<InputText Value="someValue" id="username" placeholder="Admin" readonly />-->
+            </div>
+
+            <div class="input_box">
+                <label for="Solutiondescription">Solucion del Problema</label>
+                <InputTextArea type="Solutiondescription" @bind-Value="ExistingResponse.Solutiondescription" id="Solutiondescription" readonly/>
+            </div>
+
+            <label for="document">Input Response Documents:</label>
+            <input type="file" id="document" name="document"
+                   accept="image/png, image/jpeg, .doc,.docx,.xml,
+                application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                   multiple/>
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Cerrar</Button>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private Modal? modalRef;
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsUpdate { get; set; }
+    [Parameter] public EventCallback OnOperationCompleted { get; set; }
+    [Parameter] public Solicit? ExistingSolicit { get; set; } = new();
+    
+    UserDTO userDto { get; set; } = new();
+    Response? ExistingResponse { get; set; } = new();
+    private int selectedId = 0;
+    private bool isLoaded;
+    private string defineStatus = "Vista";
+    private string titleString = "";
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    public async Task OnShowModalClick(ModalParameters modalParameters)
+    {
+        IsVisible = modalParameters.isVisible;
+        ExistingSolicit = modalParameters.messageType as Solicit;
+        ExistingResponse = new();
+        
+        if (IsVisible)
+        {
+            isLoaded = !isLoaded;
+            
+            if (ExistingSolicit != null)
+            {
+                selectedId = ExistingSolicit.Id;
+                await AssignPossibleResponse();
+                titleString = $"{ExistingSolicit.Client} {defineStatus}"; //Add User later
+            }
+            await modalRef?.ShowAsync();
+        }
+    }
+    
+    private async Task OnHideModalClick()
+    {
+        ExistingSolicit = null;
+        ExistingResponse = null;
+        await modalRef?.HideAsync(); 
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    private async Task AssignPossibleResponse()
+    {
+        var response = await ResponseController.GetBySolicitationId(selectedId);
+                 
+        if (response != null)
+        {
+            Console.WriteLine("Response for [" + ExistingSolicit.ToString()  + "] found, ID -> " + response.ToString());
+            ExistingResponse = response;
+            IsUpdate = true;
+        }
+    }
+}

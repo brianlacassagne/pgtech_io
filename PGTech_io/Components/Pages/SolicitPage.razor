@@ -1,0 +1,221 @@
+﻿@page "/solicitations"
+@using PGTech_io.Controllers
+@using PGTech_io.Models
+@using PGTech_io.Components.Modals
+@using PGTech_io.Components.UI_Model
+@inject SolicitationController SolicitationController;
+@rendermode InteractiveServer
+
+<PageTitle>Solicit</PageTitle>
+
+<h1>Solicit</h1>
+
+@if(isVisible)
+{
+    <DataTable TModel="Solicit"
+               Items="ListSolicitations"
+               AllowRowSelection="true"
+               RowClickedEvent="SelectedRowItem"
+               SelectedItemCssClass="bg-info">
+        
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         IsVisible="false"
+                         Property="(e) => e.Id"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         Property="(e) => e.Client"
+                         CustomTitle="Cliente"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         Property="(e) => e.Sector"
+                         CustomTitle="Sector"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         Property="(e) => e.Subsector"
+                         CustomTitle="Subsector"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         IsVisible="false"
+                         Property="(e) => e.Problemdescription"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         Property="(e) => e.Createdwhen"/>
+
+        <DataTableColumn TModel="Solicit"
+                         IsSortable="true"
+                         IsFilterable="true"
+                         IsVisible="false"
+                         Property="(e) => e.Updatedwhen"/>
+    </DataTable>
+}
+
+<p>SelectedRow: @SelectedSolicitation?.ToString()</p>
+
+@foreach (var item in ListSolicitations)
+{
+    <p>@item.Client</p>
+}
+    
+<!--<button class="btn btn-primary" @onclick="GetSolicitation">GetOne Solicitation (Once Please)</button>-->
+<!--<button class="btn btn-primary" @onclick="CreateSolicitation">Solicit Test</button>
+
+<ResponseModal @ref="modalRes" IsUpdate="@isUpdate" Solicit="SelectedSolicitation" OnOperationCompleted="OnAfterModalOperation"></ResponseModal>
+-->
+
+<button type="button" class="btn btn-primary" @onclick="UpsertRow">Upsert</button>
+<button type="button" class="btn btn-primary" @onclick="RespondRow">Responder</button>
+<button type="button" class="btn btn-primary" @onclick="ViewRow">Ver</button>
+
+<OperatorModal @ref="modalSolicit" OnOperationCompleted="OnAfterModalOperation"></OperatorModal>
+<ResponseModal @ref="modalResponse" OnOperationCompleted="OnAfterModalOperation"></ResponseModal>
+
+<AuthorizeView>
+    Hello @context.User.Identity?.Name!
+</AuthorizeView>
+
+<!--<AuthorizeView Roles="Admin">
+    <Authorized>
+        <ResponseModal @ref="modalResponse" OnOperationCompleted="OnAfterModalOperation"></ResponseModal>
+    </Authorized>
+    <NotAuthorized>
+        <p>Incorrect privileges</p>
+    </NotAuthorized>
+</AuthorizeView>-->
+
+<ViewModal @ref="modalView" OnOperationCompleted="OnAfterModalOperation"></ViewModal>
+
+<p>@dataInput</p>
+
+@code {
+    private OperatorModal? modalSolicit;
+    private ResponseModal? modalResponse;
+    private ViewModal? modalView;
+    private bool isModalVisible = false;
+    private List<Solicit?> ListSolicitations { get; set; }
+    private Solicit? SelectedSolicitation { get; set; } = new();
+    private string dataInput = "";
+    private bool isVisible = false;
+    private bool isUpdate = false;
+    private bool showModal = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ListSolicitations = new List<Solicit?>(await SolicitationController.GetAll());
+        
+        Console.Write($"Solicitations in List: {ListSolicitations.Count}");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isVisible = true;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task OnAfterModalOperation()
+    {
+        ListSolicitations = new List<Solicit?>(await SolicitationController.GetAll());
+        StateHasChanged();
+    }
+    
+    private async Task OpenSolicitModal()
+    {
+        try
+        {
+            if (modalSolicit is not null)
+            {
+                var parameters = new ModalParameters(isUpdate, true, SelectedSolicitation);
+                await modalSolicit.OnShowOperatorModalClick(parameters);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine("Modal open failed: " + ex.Message);
+        }
+    }
+    
+    private async Task OpenResponseModal()
+    {
+        if (SelectedSolicitation == null || SelectedSolicitation.Id == 0) return;
+        
+        try
+        {
+            if (modalResponse is not null)
+            {
+                var parameters = new ModalParameters(false, true, SelectedSolicitation);
+                await modalResponse.OnShowResponseModalClick(parameters);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine("Modal open failed: " + ex.Message);
+        }
+    }
+
+    private async Task OpenViewModal()
+    {
+        if (SelectedSolicitation == null || SelectedSolicitation.Id == 0) return;
+        
+        try
+        {
+            if (modalView is not null)
+            {
+                var parameters = new ModalParameters(false, true, SelectedSolicitation);
+                await modalView.OnShowModalClick(parameters);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine("Modal open failed: " + ex.Message);
+        }
+    }
+    
+    private Task SelectedRowItem(Solicit solicitation)
+    {
+        if (!showModal && SelectedSolicitation != solicitation)
+        {
+            SelectedSolicitation = solicitation;
+            isUpdate = true;
+            Console.WriteLine("Selected Solicitation -> " + solicitation.ToString());
+            Console.WriteLine(solicitation.Client);
+        }
+        return Task.CompletedTask;
+    }
+    
+    private void SelectedRowItem()
+    {
+        isUpdate = SelectedSolicitation != null;
+    }
+    
+    private async Task UpsertRow()
+    {
+        await OpenSolicitModal();
+        await Task.CompletedTask;
+    }
+    
+    private async Task RespondRow()
+    {
+        await OpenResponseModal();
+        await Task.CompletedTask;
+    }
+    
+    private async Task ViewRow()
+    {
+        await OpenViewModal();
+        await Task.CompletedTask;
+    }
+}
