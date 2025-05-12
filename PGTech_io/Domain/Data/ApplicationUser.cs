@@ -7,5 +7,5 @@ namespace PGTech_io.Data;
 public class ApplicationUser : IdentityUser
 {
     public virtual ICollection<Response> Responses { get; set; } 
-    public virtual ICollection<Solicit> Solicits { get; set; } 
+    public virtual ICollection<Sender> Senders { get; set; } 
 }

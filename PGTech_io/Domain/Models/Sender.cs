@@ -6,7 +6,7 @@ using PGTech_io.Interfaces;
 
 namespace PGTech_io.Models;
 
-public partial class Solicit : IMessageType
+public partial class Sender : IMessageType
 {
     [Key] public int Id { get; set; }
     public string? Client { get; set; }
@@ -22,13 +22,18 @@ public partial class Solicit : IMessageType
     
     //-----------------------------------------------------------------------------------------
     
-    public Solicit()
+    public Sender()
     {
         Createdwhen = DateOnly.FromDateTime(DateTime.UtcNow);
     }
     
     //----------------------------------------------------------------------------------------
 
+    public string IsResponded()
+    {
+        return Responses.Any() ? "Contestado" : "";
+    }
+    
     public override string ToString()
     {
         return $"{Id} {Client}";

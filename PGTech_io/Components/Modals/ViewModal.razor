@@ -9,7 +9,7 @@
 
 <Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
     <BodyTemplate>
-        <EditForm Model="@ExistingSolicit" FormName="ViewModal">
+        <EditForm Model="@existingSender" FormName="ViewModal">
         <div class="input_box">
             <label for="username">Usuario</label>
             <!--<InputText Value="someValue" id="username" placeholder="Usuario" readonly />-->
@@ -17,19 +17,19 @@
 
         <div class="input_box">
             <label for="client">Cliente</label>
-            <InputText type="client" @bind-Value="ExistingSolicit.Client"  id="client" required readonly/>
+            <InputText type="client" @bind-Value="existingSender.Client"  id="client" required readonly/>
         </div>
 
         <div class="input_box">
             <label for="sectorA">SectorA</label>
-            <InputText type="checkbox" @bind-Value="ExistingSolicit.Sector"  id="sectorA" readonly/>
+            <InputText type="checkbox" @bind-Value="existingSender.Sector"  id="sectorA" readonly/>
             <label for="sectorB">SectorB</label>
-            <InputText type="checkbox" @bind-Value="ExistingSolicit.Sector"  id="sectorB" readonly/>
+            <InputText type="checkbox" @bind-Value="existingSender.Sector"  id="sectorB" readonly/>
         </div>
 
         <div class="input_box">
             <tr>
-                <InputRadioGroup @bind-Value="ExistingSolicit.Subsector">
+                <InputRadioGroup @bind-Value="existingSender.Subsector">
                     <td><InputRadio Value="SubsectorEnums.Subsector.TestA1"/> Subsector A1</td>
                     <td><InputRadio Value="SubsectorEnums.Subsector.TestB1"/> Subsector A2</td>
                     <td><InputRadio Value="SubsectorEnums.Subsector.TestC1"/> Subsector A3</td>
@@ -40,7 +40,7 @@
         
         <div class="input_box">
             <tr>
-                <InputRadioGroup @bind-Value="ExistingSolicit.Subsector">
+                <InputRadioGroup @bind-Value="existingSender.Subsector">
                     <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A1</td>
                     <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A2</td>
                     <td><InputRadio Value="SubsectorEnums.SubsectorB.TestC2"/> Subsector A3</td>
@@ -51,12 +51,12 @@
         
         <div class="input_box">
             <label for="OtroSubsector">Otro</label>
-            <InputText type="OtroSubsector" @bind-Value="ExistingSolicit.Subsector" id="OtroSubsector" readonly/>
+            <InputText type="OtroSubsector" @bind-Value="existingSender.Subsector" id="OtroSubsector" readonly/>
         </div>
 
         <div class="input_box">
             <label for="problemDescription">Description del Problema</label>
-            <InputTextArea type="problemDescription" @bind-Value="ExistingSolicit.Problemdescription" id="problemDescription" readonly/>
+            <InputTextArea type="problemDescription" @bind-Value="existingSender.Problemdescription" id="problemDescription" readonly/>
         </div>
         
         <label for="document">Input Solicitation Documents:</label>
@@ -66,7 +66,7 @@
                multiple />
         </EditForm>
 
-        <EditForm Model="@ExistingResponse" FormName="AdminModal">
+        <EditForm Model="@existingResponse" FormName="AdminModal">
             <div class="input_box">
                 <label for="username">Usuario</label>
                 <!--<InputText Value="someValue" id="username" placeholder="Admin" readonly />-->
@@ -74,7 +74,7 @@
 
             <div class="input_box">
                 <label for="Solutiondescription">Solucion del Problema</label>
-                <InputTextArea type="Solutiondescription" @bind-Value="ExistingResponse.Solutiondescription" id="Solutiondescription" readonly/>
+                <InputTextArea type="Solutiondescription" @bind-Value="existingResponse.Solutiondescription" id="Solutiondescription" readonly/>
             </div>
 
             <label for="document">Input Response Documents:</label>
@@ -94,10 +94,9 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
     [Parameter] public EventCallback OnOperationCompleted { get; set; }
-    [Parameter] public Solicit? ExistingSolicit { get; set; } = new();
+    [Parameter] public SenderDTO? existingSender { get; set; } = new();
     
-    UserDTO userDto { get; set; } = new();
-    Response? ExistingResponse { get; set; } = new();
+    Response? existingResponse { get; set; } = new();
     private int selectedId = 0;
     private bool isLoaded;
     private string defineStatus = "Vista";
@@ -108,18 +107,18 @@
     public async Task OnShowModalClick(ModalParameters modalParameters)
     {
         IsVisible = modalParameters.isVisible;
-        ExistingSolicit = modalParameters.messageType as Solicit;
-        ExistingResponse = new();
+        existingSender = modalParameters.messageType as SenderDTO;
+        existingResponse = new();
         
         if (IsVisible)
         {
             isLoaded = !isLoaded;
             
-            if (ExistingSolicit != null)
+            if (existingSender != null)
             {
-                selectedId = ExistingSolicit.Id;
+                selectedId = existingSender.Id;
                 await AssignPossibleResponse();
-                titleString = $"{ExistingSolicit.Client} {defineStatus}"; //Add User later
+                titleString = $"{existingSender.Client} {defineStatus}"; //Add User later
             }
             await modalRef?.ShowAsync();
         }
@@ -127,8 +126,8 @@
     
     private async Task OnHideModalClick()
     {
-        ExistingSolicit = null;
-        ExistingResponse = null;
+        existingSender = null;
+        existingResponse = null;
         await modalRef?.HideAsync(); 
     }
     
@@ -146,8 +145,8 @@
                  
         if (response != null)
         {
-            Console.WriteLine("Response for [" + ExistingSolicit.ToString()  + "] found, ID -> " + response.ToString());
-            ExistingResponse = response;
+            Console.WriteLine("Response for [" + existingSender.ToString()  + "] found, ID -> " + response.ToString());
+            existingResponse = response;
             IsUpdate = true;
         }
     }

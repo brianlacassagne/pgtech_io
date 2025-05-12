@@ -61,7 +61,7 @@ public class ResponseRepository : IResponse
     {
         try
         {
-            var result = _db.Responses.FirstOrDefault(x => x.Idsolicitation == id);
+            var result = _db.Responses.FirstOrDefault(x => x.Idsender == id);
             return result;
         }
         catch (Exception e)
@@ -81,6 +81,27 @@ public class ResponseRepository : IResponse
                 Console.WriteLine("Attention: Response List is empty");
 
             return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    public async Task<string> ObtainIfSenderAnswered(int senderId)
+    {
+        string return1 = "";
+        try
+        {
+            var found = _db.Responses.FirstOrDefaultAsync(x => x.Idsender == senderId);
+            
+            Console.WriteLine(found);
+            
+            if (await found != null)
+                return1 = "Contestado";
+            
+            return return1;
         }
         catch (Exception e)
         {

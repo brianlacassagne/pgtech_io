@@ -1,0 +1,204 @@
+@page "/operatorModal"
+@using PGTech_io.Components.UI_Model
+@using PGTech_io.Controllers
+@using PGTech_io.Domain.Enums
+@using PGTech_io.DTO
+@using PGTech_io.Models
+@using PGTech_io.Services
+@rendermode InteractiveServer
+@inject SenderController SenderController
+@inject UserService UserService
+@inject SectorController SectorController
+
+<AuthorizeView>@context.User.Identity?.Name</AuthorizeView>
+
+<Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
+    <BodyTemplate>
+        <EditForm Model="@senderMessage" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+            <div class="input_box">
+                <label for="username">@userName</label>
+            </div>
+
+            <div class="input_box">
+                <label for="client">Cliente</label>
+                <InputText type="client" @bind-Value="senderMessage.Client"  id="client" required />
+            </div>
+
+            <div class="input_box">
+                <InputSelect @bind-Value="@senderMessage.Sector"> 
+                    @foreach (Sector sector in @sectors)
+                    {
+                        <input type="radio" name="sectorGroup" @value="@sector.Id" @bind="selectedSectorId" /> @sector.Name
+                    }
+                </InputSelect>
+            </div>
+            
+            <div class="input_box">
+                <tr>
+                    <InputRadioGroup @bind-Value="senderMessage.Subsector"> 
+                        @foreach (Subsector subsector in subsectors) //check this
+                        {
+                            <td><option value="@subsector.Id">@subsector.Name</option></td>
+                        }
+                    </InputRadioGroup>
+                </tr>
+            </div>
+        
+            <div class="input_box">
+                <label for="OtroSubsector">Otro</label>
+                <InputText type="OtroSubsector" @bind-Value="senderMessage.Subsector" id="OtroSubsector" />
+            </div>
+
+            <div class="input_box">
+                <label for="problemDescription">Description del Problema</label>
+                <InputTextArea type="problemDescription" @bind-Value="senderMessage.Problemdescription" id="problemDescription" />
+            </div>
+        
+            <label for="document">Input Solicitation Documents:</label>
+            <input type="file" id="document" name="document" 
+                   accept="image/png, image/jpeg, .doc,.docx,.xml,
+                application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                   multiple />
+        
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Cerrar</Button>
+        <Button Color="ButtonColor.Primary" @onclick="SelectOperation">@defineStatus</Button>
+    </FooterTemplate>
+    
+</Modal>
+
+
+@code {
+    
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsUpdate { get; set; }
+    [Parameter] public EventCallback onOperationCompleted { get; set; }
+    [Parameter] public SenderDTO? senderMessage { get; set; } = new();
+    
+    private int selectedSectorId { get; set; }
+    private Modal? modalRef;
+    List<Sector> sectors = new();
+    List<Subsector> subsectors = new();
+    private string defineStatus = string.Empty;
+    private string userName = string.Empty;
+    private int selectedId = 0;
+    private bool isLoaded;
+    
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    public async Task OnShowOperatorModalClick(ModalParameters modalParameters)
+    {
+        IsUpdate = modalParameters.isUpdate;
+        senderMessage = modalParameters.messageType as SenderDTO;
+        IsVisible = modalParameters.isVisible;
+        
+        if (!IsVisible) return;
+        
+        isLoaded = !isLoaded;
+        if (senderMessage != null) { selectedSolicitId(); }
+        senderMessage.Iduser = modalParameters.userId;
+        defineStatus = IsUpdate ? "Update" : "Guardar";
+
+        setUserName();
+        
+        await modalRef?.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modalRef?.HideAsync(); 
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    protected override async Task OnInitializedAsync()
+    {
+        sectors = [
+            new Sector("Fifo"), 
+            new Sector("Tofu"),
+            new Sector("Lifo")
+        ]; 
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private void selectedSolicitId()
+    {
+        selectedId = senderMessage.Id;
+    }
+
+    private async Task setUserName()
+    {
+        userName = await @UserService.UserName();
+    }
+
+    private async Task SelectOperation()
+    {
+        Console.WriteLine("IsUpdate:" + IsUpdate);
+    
+        if (IsUpdate)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
+
+        await OnHideModalClick();
+        await ReturnTask();
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+    
+    private async Task Create() //Move to Validations
+    {
+        //if (!ValidateData()) return;
+        
+        if (senderMessage == null) senderMessage = new(); 
+        
+        var sender = await SenderController.Post(senderMessage);
+        
+        if (sender)
+        {
+            Console.WriteLine("Solicitation sent!");
+        }
+    }
+    
+
+    private async Task Update()
+    {
+        //if (!ValidateData()) return;
+        
+        if (senderMessage == null) return;
+
+        var response = await SenderController.Put(senderMessage, selectedId);
+
+        if (response)
+        {
+            Console.WriteLine("Solicitation updated!");
+        }
+    }
+    
+    //------------------------------------------------------------------------------------------------------------------
+
+    private async Task ReturnTask()
+    {
+        await onOperationCompleted.InvokeAsync();
+        await OnHideModalClick();
+    }
+
+    private bool ValidateData()
+    {
+        return true;
+    }
+
+    private async Task SetSector(int sectorId) // SR check
+    {
+        selectedSectorId = sectorId;
+        subsectors = await SectorController.GetSubsectorsById(sectorId);
+    }
+}

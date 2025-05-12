@@ -13,8 +13,8 @@ public partial class Response : IMessageType
     public DateOnly Createdwhen { get; set; }
     public DateOnly? Updatedwhen { get; set; }
     public string? Iduser { get; set; } // = null!;
-    public int Idsolicitation { get; set; }
-    public virtual Solicit IdsolicitationNavigation { get; set; } = null!;
+    public int Idsender { get; set; }
+    public virtual Sender IdsolicitationNavigation { get; set; } = null!;
     public virtual ApplicationUser IduserNavigation { get; set; } = null!;
     
      //------------------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ public partial class Response : IMessageType
     
     public override string ToString()
     {
-        return $"{Id} {Idsolicitation}";
+        return $"{Id} {Idsender}";
     }
 
     //------------------------------------------------------------------------------------------------------------------

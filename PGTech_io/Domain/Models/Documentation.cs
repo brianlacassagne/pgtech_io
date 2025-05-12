@@ -12,7 +12,7 @@ public partial class Documentation
     public string Fileurl { get; set; } = null!;
     public DateOnly Createdwhen { get; set; }
     public int IdSolicitation { get; set; }
-    public virtual Solicit IdSolicitationNavigation { get; set; } = null!;
+    public virtual Sender IdSolicitationNavigation { get; set; } = null!;
     
     //------------------------------------------------------------------------------------------------------------------
 

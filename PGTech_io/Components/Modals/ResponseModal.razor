@@ -3,21 +3,21 @@
 @using PGTech_io.Controllers
 @using PGTech_io.DTO
 @using PGTech_io.Models
+@using PGTech_io.Services
 @rendermode InteractiveServer
 @inject ResponseController ResponseController;
-@inject SolicitationController SolicitationController
+@inject UserService UserService;
 
 <Modal @ref="modalRef" Title="@titleString" IsVerticallyCentered="true" Size="ModalSize.Large">
     <BodyTemplate>
-        <EditForm Model="@ExistingResponse" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
+        <EditForm Model="@existingResponse" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
             <div class="input_box">
-                <label for="username">Usuario</label>
-            <!--<InputText Value="someValue" id="username" placeholder="Admin" readonly />-->
+                <label for="username">@userName</label>
             </div>
 
             <div class="input_box">
                 <label for="Solutiondescription">Solucion del Problema</label>
-                <InputTextArea type="Solutiondescription" @bind-Value="ExistingResponse.Solutiondescription" id="Solutiondescription"/>
+                <InputTextArea type="Solutiondescription" @bind-Value="existingResponse.Solutiondescription" id="Solutiondescription"/>
             </div>
 
             <label for="document">Input Response Documents:</label>
@@ -25,7 +25,6 @@
                    accept="image/png, image/jpeg, .doc,.docx,.xml,
                 application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                    multiple/>
-
         </EditForm>
     </BodyTemplate>
     <FooterTemplate>
@@ -38,16 +37,15 @@
     private Modal? modalRef;
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
-    [Parameter] public EventCallback OnOperationCompleted { get; set; }
-    [Parameter] public Solicit? SolicitParam { get; set; } = new();
+    [Parameter] public EventCallback onOperationCompleted { get; set; }
+    [Parameter] public SenderDTO? senderMessage { get; set; } = new();
     
-    UserDTO userDto { get; set; } = new();
-    Response? ExistingResponse { get; set; } = new();
+    Response? existingResponse { get; set; } = new();
     private int selectedId = 0;
     private bool isLoaded;
-    private bool hasOperated = false;
     private string defineStatus = "";
     private string titleString = "";
+    private string userName = "";
     
     //------------------------------------------------------------------------------------------------------------------
 
@@ -55,34 +53,32 @@
     {
         IsVisible = modalParameters.isVisible;
         IsUpdate = modalParameters.isUpdate;
-        SolicitParam = modalParameters.messageType as Solicit;
-        ExistingResponse = new();
+        senderMessage = modalParameters.messageType as SenderDTO;
+        existingResponse = new();
+
+        if (!IsVisible || senderMessage == null) return;
         
-        if (IsVisible)
-        {
-            isLoaded = !isLoaded;
-            
-            if (SolicitParam != null)
-            {
-                await AssignPossibleResponse();
-                selectedId = SolicitParam.Id;
-                defineStatus = IsUpdate ? "Update" : "Guardar";
-                titleString = $"{SolicitParam.Client} {defineStatus}"; //Add User later
-            }
-            await modalRef?.ShowAsync();
-        }
+        isLoaded = !isLoaded;
+        await AssignResponse();
+        existingResponse.Iduser = modalParameters.userId; // move to constructor
+        selectedId = senderMessage.Id;
+        defineStatus = IsUpdate ? "Update" : "Guardar";
+        titleString = $"{senderMessage.Client} {defineStatus}"; //Add User later
+        
+        setUserName();
+        
+        await modalRef?.ShowAsync();
     }
 
-    private async Task AssignPossibleResponse()
+    private async Task AssignResponse()
     {
         var response = await ResponseController.GetBySolicitationId(selectedId);
-                 
-        if (response != null)
-        {
-            Console.WriteLine("Response for [" + SolicitParam.ToString()  + "] found, ID -> " + response.ToString());
-            ExistingResponse = response;
-            IsUpdate = true;
-        }
+        if (response == null) return;
+        
+        Console.WriteLine("Response for [" + senderMessage  + "] found, ID -> " + response);
+        existingResponse = response;
+        
+        IsUpdate = true;
     }
 
     private async Task OnHideModalClick()
@@ -107,7 +103,7 @@
         
         else await Create();
 
-        ExistingResponse = null;
+        existingResponse = null;
         await OnHideModalClick();
         await ReturnTask();
     }
@@ -117,10 +113,9 @@
     private async Task Create() //Move to Validations
     {
         //if (!ValidateData()) return;
-
-        if (SolicitParam == null || ExistingResponse == null) return;
+        if (senderMessage == null || existingResponse == null) return;
         
-        var response = await ResponseController.Post(ExistingResponse, SolicitParam.Id);
+        var response = await ResponseController.Post(existingResponse, senderMessage.Id);
         
         if (response)
         {
@@ -133,9 +128,9 @@
     {
         //if (!ValidateData()) return;
         
-        if (SolicitParam == null || ExistingResponse == null) return;
+        if (senderMessage == null || existingResponse == null) return;
 
-        var response = await ResponseController.Put(ExistingResponse, ExistingResponse.Id);
+        var response = await ResponseController.Put(existingResponse, existingResponse.Id);
 
         if (response)
         {
@@ -143,12 +138,16 @@
         }
     }
     
+    private async Task setUserName()
+    {
+        userName = await @UserService.UserName();
+    }
     
     //------------------------------------------------------------------------------------------------------------------
 
     private async Task ReturnTask()
     {
-        await OnOperationCompleted.InvokeAsync();
+        await onOperationCompleted.InvokeAsync();
         await OnHideModalClick();
     }
 

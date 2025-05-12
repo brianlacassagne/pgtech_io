@@ -10,4 +10,5 @@ public interface IResponse
     public Task<List<Response?>> GetAll();
     public Task<bool> Update(Response response, int id);
     public Task<bool> Delete(Response response);
+    public Task<string> ObtainIfSenderAnswered(int senderId);
 }

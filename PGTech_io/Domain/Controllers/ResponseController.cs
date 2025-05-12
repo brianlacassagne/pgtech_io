@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PGTech_io.DTO;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
 
@@ -17,7 +18,7 @@ public class ResponseController : ControllerBase
     [HttpPost]
     public async Task<bool> Post([FromBody] Response response, int solicitationId)
     {
-        response.Idsolicitation = solicitationId;
+        response.Idsender = solicitationId;
         var result = await repository.Create(response);
         return result;
     }
@@ -40,6 +41,13 @@ public class ResponseController : ControllerBase
     public async Task<List<Response?>> GetAll()
     {
         var result = await repository.GetAll();
+        return result;
+    }
+    
+    [HttpGet]
+    public async Task<string> ObtainIfSenderAnswered(SenderDTO sender)
+    {
+        var result = await repository.ObtainIfSenderAnswered(sender.Id);
         return result;
     }
 

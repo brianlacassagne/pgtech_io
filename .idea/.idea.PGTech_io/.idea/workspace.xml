@@ -12,81 +12,41 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9dbcf0ee-3f72-4a17-8c81-a181cc6a8bff" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/ViewModal.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Enums/SubsectorEnums.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Migrations/20250509062341_Initial.Designer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Migrations/20250509062341_Initial.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Migrations/20250509122806_Identity Test.Designer.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Migrations/20250509122806_Identity Test.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PGTech_io/Migrations/ContextModelSnapshot.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Constants/SenderConstants.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/SectorController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/DTO/SenderDTO.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/ISender.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Mappers/SenderMapper.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SectorRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PGTech_io/Domain/Services/UserService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.PGTech_io/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PGTech_io/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityComponentsEndpointRouteBuilderExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityComponentsEndpointRouteBuilderExtensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityNoOpEmailSender.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityNoOpEmailSender.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityRedirectManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityRedirectManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityRevalidatingAuthenticationStateProvider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityRevalidatingAuthenticationStateProvider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityUserAccessor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/IdentityUserAccessor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ConfirmEmail.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ConfirmEmail.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ConfirmEmailChange.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ConfirmEmailChange.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ExternalLogin.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ExternalLogin.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ForgotPassword.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ForgotPassword.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Login.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Login.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/LoginWith2fa.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/LoginWith2fa.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/LoginWithRecoveryCode.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/LoginWithRecoveryCode.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ChangePassword.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ChangePassword.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/DeletePersonalData.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/DeletePersonalData.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Disable2fa.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Disable2fa.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Email.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Email.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/EnableAuthenticator.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/EnableAuthenticator.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ExternalLogins.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ExternalLogins.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/GenerateRecoveryCodes.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/GenerateRecoveryCodes.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Index.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/Index.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/PersonalData.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/PersonalData.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ResetAuthenticator.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/ResetAuthenticator.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/SetPassword.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/SetPassword.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/TwoFactorAuthentication.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/TwoFactorAuthentication.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/_Imports.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Manage/_Imports.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Register.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Register.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/RegisterConfirmation.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/RegisterConfirmation.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ResendEmailConfirmation.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ResendEmailConfirmation.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ResetPassword.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Pages/ResetPassword.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ExternalLoginPicker.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ExternalLoginPicker.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ManageLayout.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ManageLayout.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ManageNavMenu.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/ManageNavMenu.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/RedirectToLogin.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Account/Shared/RedirectToLogin.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/App.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/App.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Layout/NavMenu.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Layout/NavMenu.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Modals/OperatorModal.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/OperatorModal.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Modals/OperatorModal.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/SenderModal.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Modals/OperatorModal.razor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/SenderModal.razor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Modals/ResponseModal.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/ResponseModal.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Pages/Solicitations.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Pages/SolicitPage.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Constants/SolicitationConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Constants/SolicitationConstants.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Controllers/DocumentationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/DocumentationController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Controllers/ResponseController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/ResponseController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Controllers/SolicitationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/SolicitationController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/DTO/UserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/DTO/UserDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/ApplicationDbContext.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/ApplicationUser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Data/ApplicationUser.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/Migrations/00000000000000_CreateIdentitySchema.Designer.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/Migrations/00000000000000_CreateIdentitySchema.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/Migrations/ApplicationDbContextModelSnapshot.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Data/app.db" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Interfaces/IDocumentation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/IDocumentation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Interfaces/IMessageType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/IMessageType.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Interfaces/IResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/IResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Interfaces/ISolicitation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/ISolicitation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Mappers/UserMapper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Mappers/UserMapper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Models/Documentation.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Models/Model_UI/Sector.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Models/Model_UI/Subsector.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Models/Response.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Models/Solicitation.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/PGTech_io.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/PGTech_io.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Modals/ViewModal.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Modals/ViewModal.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Pages/Home.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Pages/Home.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/Pages/SolicitPage.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/Pages/MessagePage.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/UI_Model/ModalParameters.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/UI_Model/ModalParameters.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Components/_Imports.razor" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Components/_Imports.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Constants/DocumentationConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Constants/DocumentationConstants.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Constants/ResponseConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Constants/ResponseConstants.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Constants/SolicitationConstants.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/ResponseController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/ResponseController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/SolicitationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/SenderController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/DTO/UserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/DTO/UserDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Data/ApplicationUser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Data/ApplicationUser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Data/Context.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Data/Context.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/IResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/IResponse.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Interfaces/ISolicitation.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Models/Documentation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Models/Documentation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Models/Model_UI/Sector.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Models/Model_UI/Sector.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Models/Response.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Models/Response.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Models/Solicit.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Models/Sender.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Repository/ResponseRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/ResponseRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SenderRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PGTech_io/Migrations/ContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Migrations/ContextModelSnapshot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PGTech_io/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Repository/DocumentationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/DocumentationRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Repository/ResponseRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/ResponseRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Repository/SolicitationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/Service/FirestoreService.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PGTech_io/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/PGTech_io/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -272,6 +232,9 @@
       <workItem from="1746757869257" duration="9201000" />
       <workItem from="1746767305797" duration="4584000" />
       <workItem from="1746790772773" duration="8089000" />
+      <workItem from="1746818250863" duration="1001000" />
+      <workItem from="1747053546123" duration="3074000" />
+      <workItem from="1747056645257" duration="25256000" />
     </task>
     <servers />
   </component>
@@ -323,67 +286,47 @@
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Components/Modals/ViewModal.razor</url>
-          <line>109</line>
-          <properties isMultiMethodBreakpoint="true">
-            <option name="multiMethodBreakpoint" value="true" />
-          </properties>
-          <option name="timeStamp" value="82" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs</url>
-          <line>19</line>
-          <properties documentPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs" containingFunctionPresentation="Method 'Create'">
+          <url>file://$PROJECT_DIR$/PGTech_io/Domain/Models/Sender.cs</url>
+          <line>32</line>
+          <properties documentPath="$PROJECT_DIR$/PGTech_io/Domain/Models/Sender.cs" containingFunctionPresentation="Method 'IsResponded'">
             <startOffsets>
-              <option value="438" />
+              <option value="1181" />
             </startOffsets>
             <endOffsets>
-              <option value="511" />
+              <option value="1182" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="83" />
+          <option name="timeStamp" value="91" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs</url>
-          <line>78</line>
-          <properties documentPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs" containingFunctionPresentation="Method 'Update'">
+          <url>file://$PROJECT_DIR$/PGTech_io/Domain/Services/UserService.cs</url>
+          <line>18</line>
+          <properties documentPath="$PROJECT_DIR$/PGTech_io/Domain/Controllers/UserController.cs" containingFunctionPresentation="Method 'obtainUserNameById'">
             <startOffsets>
-              <option value="1882" />
+              <option value="443" />
             </startOffsets>
             <endOffsets>
-              <option value="1955" />
+              <option value="492" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="85" />
+          <option name="timeStamp" value="102" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs</url>
-          <line>38</line>
-          <properties documentPath="$PROJECT_DIR$/PGTech_io/Domain/Repository/SolicitationRepository.cs" containingFunctionPresentation="Method 'Create'">
-            <startOffsets>
-              <option value="1014" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1048" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="88" />
+          <url>file://$PROJECT_DIR$/PGTech_io/Components/Modals/ResponseModal.razor</url>
+          <line>53</line>
+          <option name="timeStamp" value="112" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Components/Pages/SolicitPage.razor</url>
-          <line>130</line>
-          <option name="timeStamp" value="89" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/PGTech_io/Components/Account/Pages/Register.razor</url>
-          <line>74</line>
-          <option name="timeStamp" value="90" />
+          <url>file://$PROJECT_DIR$/PGTech_io/Components/Pages/MessagePage.razor</url>
+          <line>179</line>
+          <option name="timeStamp" value="115" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="Type#Google.Cloud.Firestore.DocumentReference" memberName="Database" />
+        <PinnedItemInfo parentTag="Type#PGTech_io.Models.Sector" memberName="Name" />
         <PinnedItemInfo parentTag="Type#Google.Cloud.Firestore.DocumentSnapshot" memberName="Id" />
       </pinned-members>
     </pin-to-top-manager>

@@ -8,8 +8,8 @@ using PGTech_io.Data;
 using PGTech_io.Interfaces;
 using PGTech_io.Mappers;
 using PGTech_io.Repository;
-using Microsoft.EntityFrameworkCore;
 using PGTech_io.Models;
+using PGTech_io.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,11 +47,13 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddScoped<IDocumentation, DocumentationRepository>();
 builder.Services.AddScoped<IResponse, ResponseRepository>();
-builder.Services.AddScoped<ISolicitation, SolicitationRepository>();
+builder.Services.AddScoped<ISender, SenderRepository>();
 
 builder.Services.AddScoped<DocumentationController>();
 builder.Services.AddScoped<ResponseController>();
-builder.Services.AddScoped<SolicitationController>();
+builder.Services.AddScoped<SenderController>();
+builder.Services.AddScoped<SectorController>();
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddAutoMapper(typeof(UserMapper));
 

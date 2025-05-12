@@ -24,7 +24,7 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
 
     public virtual DbSet<Sector> Sectors { get; set; }
 
-    public virtual DbSet<Solicit> Solicits { get; set; }
+    public virtual DbSet<Sender> Solicits { get; set; }
 
     public virtual DbSet<Subsector> Subsectors { get; set; }
 
@@ -40,9 +40,9 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
         {
             new IdentityRole
             {
-                Id = "Admin",
-                Name = "Admin",
-                NormalizedName = "ADMIN"
+                Id = "Tecnico",
+                Name = "Tecnico",
+                NormalizedName = "TECNICO"
             },
 
             new IdentityRole
@@ -91,7 +91,7 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.Createdwhen).HasColumnName("createdwhen");
-            entity.Property(e => e.Idsolicitation).HasColumnName("idsolicitation");
+            entity.Property(e => e.Idsender).HasColumnName("idsolicitation");
             entity.Property(e => e.Iduser)
                 .HasMaxLength(255)
                 .HasColumnName("iduser");
@@ -101,7 +101,7 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
             entity.Property(e => e.Updatedwhen).HasColumnName("updatedwhen");
 
             entity.HasOne(d => d.IdsolicitationNavigation).WithMany(p => p.Responses)
-                .HasForeignKey(d => d.Idsolicitation)
+                .HasForeignKey(d => d.Idsender)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_solicit");
 
@@ -123,7 +123,7 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
                 .HasColumnName("name");
         });
 
-        modelBuilder.Entity<Solicit>(entity =>
+        modelBuilder.Entity<Sender>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("Solicits_pkey");
 
@@ -148,7 +148,7 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
                 .HasColumnName("subsector");
             entity.Property(e => e.Updatedwhen).HasColumnName("updatedwhen");
 
-            entity.HasOne(d => d.IduserNavigation).WithMany(p => p.Solicits)
+            entity.HasOne(d => d.IduserNavigation).WithMany(p => p.Senders)
                 .HasForeignKey(d => d.Iduser)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_user");
