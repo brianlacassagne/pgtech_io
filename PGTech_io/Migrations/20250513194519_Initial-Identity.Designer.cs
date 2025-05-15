@@ -12,7 +12,7 @@ using PGTech_io.Models;
 namespace PGTech_io.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250509125715_Initial Identity")]
+    [Migration("20250513194519_Initial-Identity")]
     partial class InitialIdentity
     {
         /// <inheritdoc />
@@ -54,9 +54,9 @@ namespace PGTech_io.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "Admin",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Id = "Tecnico",
+                            Name = "Tecnico",
+                            NormalizedName = "TECNICO"
                         },
                         new
                         {
@@ -260,9 +260,10 @@ namespace PGTech_io.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FileURLProperty")
+                    b.Property<string>("FileUrlproperty")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("FileURLProperty");
 
                     b.Property<string>("Filename")
                         .IsRequired()
@@ -285,14 +286,14 @@ namespace PGTech_io.Migrations
                     b.Property<int>("IdProperty")
                         .HasColumnType("integer");
 
-                    b.Property<int>("IdSolicitation")
+                    b.Property<int>("Idsolicitation")
                         .HasColumnType("integer")
                         .HasColumnName("idsolicitation");
 
                     b.HasKey("Id")
                         .HasName("Documentation_pkey");
 
-                    b.HasIndex("IdSolicitation");
+                    b.HasIndex(new[] { "Idsolicitation" }, "IX_Documentation_idsolicitation");
 
                     b.ToTable("Documentation", "identity");
                 });
@@ -332,9 +333,9 @@ namespace PGTech_io.Migrations
                     b.HasKey("Id")
                         .HasName("Responses_pkey");
 
-                    b.HasIndex("Idsolicitation");
+                    b.HasIndex(new[] { "Idsolicitation" }, "IX_Responses_idsolicitation");
 
-                    b.HasIndex("Iduser");
+                    b.HasIndex(new[] { "Iduser" }, "IX_Responses_iduser");
 
                     b.ToTable("Responses", "identity");
                 });
@@ -360,7 +361,7 @@ namespace PGTech_io.Migrations
                     b.ToTable("Sectors", "identity");
                 });
 
-            modelBuilder.Entity("PGTech_io.Models.Solicit", b =>
+            modelBuilder.Entity("PGTech_io.Models.Send", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -378,6 +379,12 @@ namespace PGTech_io.Migrations
                         .HasColumnType("date")
                         .HasColumnName("createdwhen");
 
+                    b.Property<int>("Idsector")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdsectorNavigationId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Iduser")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -387,11 +394,6 @@ namespace PGTech_io.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("problemdescription");
-
-                    b.Property<string>("Sector")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("sector");
 
                     b.Property<string>("Subsector")
                         .HasMaxLength(255)
@@ -403,11 +405,13 @@ namespace PGTech_io.Migrations
                         .HasColumnName("updatedwhen");
 
                     b.HasKey("Id")
-                        .HasName("Solicits_pkey");
+                        .HasName("Sends_pkey");
 
-                    b.HasIndex("Iduser");
+                    b.HasIndex("IdsectorNavigationId");
 
-                    b.ToTable("Solicits", "identity");
+                    b.HasIndex(new[] { "Iduser" }, "IX_Sends_iduser");
+
+                    b.ToTable("Sends", "identity");
                 });
 
             modelBuilder.Entity("PGTech_io.Models.Subsector", b =>
@@ -431,7 +435,7 @@ namespace PGTech_io.Migrations
                     b.HasKey("Id")
                         .HasName("Subsectors_pkey");
 
-                    b.HasIndex("Idsector");
+                    b.HasIndex(new[] { "Idsector" }, "IX_Subsectors_idsector");
 
                     b.ToTable("Subsectors", "identity");
                 });
@@ -489,18 +493,18 @@ namespace PGTech_io.Migrations
 
             modelBuilder.Entity("PGTech_io.Models.Documentation", b =>
                 {
-                    b.HasOne("PGTech_io.Models.Solicit", "IdSolicitationNavigation")
+                    b.HasOne("PGTech_io.Models.Send", "IdsolicitationNavigation")
                         .WithMany("Documentations")
-                        .HasForeignKey("IdSolicitation")
+                        .HasForeignKey("Idsolicitation")
                         .IsRequired()
                         .HasConstraintName("fk_solicit");
 
-                    b.Navigation("IdSolicitationNavigation");
+                    b.Navigation("IdsolicitationNavigation");
                 });
 
             modelBuilder.Entity("PGTech_io.Models.Response", b =>
                 {
-                    b.HasOne("PGTech_io.Models.Solicit", "IdsolicitationNavigation")
+                    b.HasOne("PGTech_io.Models.Send", "IdsolicitationNavigation")
                         .WithMany("Responses")
                         .HasForeignKey("Idsolicitation")
                         .IsRequired()
@@ -516,12 +520,18 @@ namespace PGTech_io.Migrations
                     b.Navigation("IduserNavigation");
                 });
 
-            modelBuilder.Entity("PGTech_io.Models.Solicit", b =>
+            modelBuilder.Entity("PGTech_io.Models.Send", b =>
                 {
+                    b.HasOne("PGTech_io.Models.Sector", "IdsectorNavigation")
+                        .WithMany("Sends")
+                        .HasForeignKey("IdsectorNavigationId");
+
                     b.HasOne("PGTech_io.Data.ApplicationUser", "IduserNavigation")
-                        .WithMany("Solicits")
+                        .WithMany("Senders")
                         .HasForeignKey("Iduser")
                         .HasConstraintName("fk_user");
+
+                    b.Navigation("IdsectorNavigation");
 
                     b.Navigation("IduserNavigation");
                 });
@@ -541,15 +551,17 @@ namespace PGTech_io.Migrations
                 {
                     b.Navigation("Responses");
 
-                    b.Navigation("Solicits");
+                    b.Navigation("Senders");
                 });
 
             modelBuilder.Entity("PGTech_io.Models.Sector", b =>
                 {
+                    b.Navigation("Sends");
+
                     b.Navigation("Subsectors");
                 });
 
-            modelBuilder.Entity("PGTech_io.Models.Solicit", b =>
+            modelBuilder.Entity("PGTech_io.Models.Send", b =>
                 {
                     b.Navigation("Documentations");
 

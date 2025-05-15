@@ -48,6 +48,7 @@ builder.Services.AddScoped<IEmailSender<ApplicationUser>, IdentityNoOpEmailSende
 builder.Services.AddScoped<IDocumentation, DocumentationRepository>();
 builder.Services.AddScoped<IResponse, ResponseRepository>();
 builder.Services.AddScoped<ISender, SenderRepository>();
+builder.Services.AddScoped<ISector, SectorRepository>();
 
 builder.Services.AddScoped<DocumentationController>();
 builder.Services.AddScoped<ResponseController>();

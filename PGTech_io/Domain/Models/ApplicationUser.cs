@@ -7,5 +7,10 @@ namespace PGTech_io.Data;
 public class ApplicationUser : IdentityUser
 {
     public virtual ICollection<Response> Responses { get; set; } 
-    public virtual ICollection<Sender> Senders { get; set; } 
+    public virtual ICollection<Send> Senders { get; set; }
+
+    public override string ToString()
+    {
+        return this != null ? UserName : "";
+    }
 }

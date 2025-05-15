@@ -8,7 +8,7 @@ public class SenderMapper : Profile
 {
     public SenderMapper()
     {
-        CreateMap<Sender, SenderDTO>();
-        CreateMap<SenderDTO, Sender>();
+        CreateMap<Send, SenderDTO>();
+        CreateMap<SenderDTO, Send>();
     }
 }

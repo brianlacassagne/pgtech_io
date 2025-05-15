@@ -18,7 +18,7 @@ public class ResponseController : ControllerBase
     [HttpPost]
     public async Task<bool> Post([FromBody] Response response, int solicitationId)
     {
-        response.Idsender = solicitationId;
+        response.Idsolicitation = solicitationId;
         var result = await repository.Create(response);
         return result;
     }

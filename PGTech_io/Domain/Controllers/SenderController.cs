@@ -36,6 +36,13 @@ public class SenderController : ControllerBase
         return result;
     }
     
+    [HttpGet]
+    public async Task<List<SenderDTO?>> GetAllByUserId(string userId)
+    {
+        var result = await repository.GetAllByUserId(userId);
+        return result;
+    }
+    
     [HttpPut("id/{id:int}")]
     public async Task<bool> Put([FromBody] SenderDTO sender, int id)
     {

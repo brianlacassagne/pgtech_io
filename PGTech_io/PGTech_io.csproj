@@ -65,6 +65,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Domain\Models\Model_UI\" />
       <Folder Include="Migrations\" />
     </ItemGroup>
 

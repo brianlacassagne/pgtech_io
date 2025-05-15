@@ -1,6 +1,5 @@
 using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
-using PGTech_io.Components.Constants;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
 
@@ -45,7 +44,7 @@ public class DocumentationRepository : IDocumentation
     {
         try
         {
-            var documentations = _db.Documentations.Where(x => x.IdSolicitation == solicitId).ToList();
+            var documentations = _db.Documentations.Where(x => x.Idsolicitation == solicitId).ToList();
             
             if (documentations.Count == 0)
                 Console.WriteLine($"Attention! List of Documents belonging to {solicitId} is empty!");

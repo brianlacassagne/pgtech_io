@@ -17,15 +17,10 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
         : base(options)
     {
     }
-
     public virtual DbSet<Documentation> Documentations { get; set; }
-
     public virtual DbSet<Response> Responses { get; set; }
-
     public virtual DbSet<Sector> Sectors { get; set; }
-
-    public virtual DbSet<Sender> Solicits { get; set; }
-
+    public virtual DbSet<Send> Sends { get; set; }
     public virtual DbSet<Subsector> Subsectors { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -55,17 +50,20 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
 
         modelBuilder.Entity<IdentityRole>().HasData(roles);
         modelBuilder.HasDefaultSchema("identity");
-        
+
         modelBuilder.Entity<Documentation>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("Documentation_pkey");
 
-            entity.ToTable("Documentation");
+            entity.ToTable("Documentation", "identity");
+
+            entity.HasIndex(e => e.Idsolicitation, "IX_Documentation_idsolicitation");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.Createdwhen).HasColumnName("createdwhen");
+            entity.Property(e => e.FileUrlproperty).HasColumnName("FileURLProperty");
             entity.Property(e => e.Filename)
                 .HasMaxLength(255)
                 .HasColumnName("filename");
@@ -75,10 +73,10 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
             entity.Property(e => e.Fileurl)
                 .HasMaxLength(255)
                 .HasColumnName("fileurl");
-            entity.Property(e => e.IdSolicitation).HasColumnName("idsolicitation");
+            entity.Property(e => e.Idsolicitation).HasColumnName("idsolicitation");
 
-            entity.HasOne(d => d.IdSolicitationNavigation).WithMany(p => p.Documentations)
-                .HasForeignKey(d => d.IdSolicitation)
+            entity.HasOne(d => d.IdsolicitationNavigation).WithMany(p => p.Documentations)
+                .HasForeignKey(d => d.Idsolicitation)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_solicit");
         });
@@ -87,11 +85,17 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
         {
             entity.HasKey(e => e.Id).HasName("Responses_pkey");
 
+            entity.ToTable("Responses", "identity");
+
+            entity.HasIndex(e => e.Idsolicitation, "IX_Responses_idsolicitation");
+
+            entity.HasIndex(e => e.Iduser, "IX_Responses_iduser");
+
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.Createdwhen).HasColumnName("createdwhen");
-            entity.Property(e => e.Idsender).HasColumnName("idsolicitation");
+            entity.Property(e => e.Idsolicitation).HasColumnName("idsolicitation");
             entity.Property(e => e.Iduser)
                 .HasMaxLength(255)
                 .HasColumnName("iduser");
@@ -101,19 +105,20 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
             entity.Property(e => e.Updatedwhen).HasColumnName("updatedwhen");
 
             entity.HasOne(d => d.IdsolicitationNavigation).WithMany(p => p.Responses)
-                .HasForeignKey(d => d.Idsender)
+                .HasForeignKey(d => d.Idsolicitation)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_solicit");
 
             entity.HasOne(d => d.IduserNavigation).WithMany(p => p.Responses)
                 .HasForeignKey(d => d.Iduser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_user");
         });
 
         modelBuilder.Entity<Sector>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("Sectors_pkey");
+
+            entity.ToTable("Sectors", "identity");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
@@ -123,9 +128,13 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
                 .HasColumnName("name");
         });
 
-        modelBuilder.Entity<Sender>(entity =>
+        modelBuilder.Entity<Send>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("Solicits_pkey");
+            entity.HasKey(e => e.Id).HasName("Sends_pkey");
+
+            entity.ToTable("Sends", "identity");
+
+            entity.HasIndex(e => e.Iduser, "IX_Sends_iduser");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
@@ -140,23 +149,20 @@ public partial class Context : IdentityDbContext<ApplicationUser, IdentityRole, 
             entity.Property(e => e.Problemdescription)
                 .HasMaxLength(255)
                 .HasColumnName("problemdescription");
-            entity.Property(e => e.Sector)
-                .HasMaxLength(255)
-                .HasColumnName("sector");
-            entity.Property(e => e.Subsector)
-                .HasMaxLength(255)
-                .HasColumnName("subsector");
             entity.Property(e => e.Updatedwhen).HasColumnName("updatedwhen");
 
             entity.HasOne(d => d.IduserNavigation).WithMany(p => p.Senders)
                 .HasForeignKey(d => d.Iduser)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_user");
         });
 
         modelBuilder.Entity<Subsector>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("Subsectors_pkey");
+
+            entity.ToTable("Subsectors", "identity");
+
+            entity.HasIndex(e => e.Idsector, "IX_Subsectors_idsector");
 
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()

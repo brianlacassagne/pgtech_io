@@ -1,6 +1,5 @@
 using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
-using PGTech_io.Components.Constants;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
 
@@ -21,6 +20,8 @@ public class ResponseRepository : IResponse
             
         try
         {
+            response.Createdwhen = DateOnly.FromDateTime(DateTime.UtcNow);
+            
             _db.Add(response);
 
             var saved = await _db.SaveChangesAsync() > 0;
@@ -61,7 +62,7 @@ public class ResponseRepository : IResponse
     {
         try
         {
-            var result = _db.Responses.FirstOrDefault(x => x.Idsender == id);
+            var result = _db.Responses.FirstOrDefault(x => x.Idsolicitation == id);
             return result;
         }
         catch (Exception e)
@@ -94,7 +95,7 @@ public class ResponseRepository : IResponse
         string return1 = "";
         try
         {
-            var found = _db.Responses.FirstOrDefaultAsync(x => x.Idsender == senderId);
+            var found = _db.Responses.FirstOrDefaultAsync(x => x.Idsolicitation == senderId);
             
             Console.WriteLine(found);
             
@@ -116,6 +117,8 @@ public class ResponseRepository : IResponse
         
         try
         {
+            response.Updatedwhen = DateOnly.FromDateTime(DateTime.UtcNow);
+            
             var existingResponse = await _db.Responses.FindAsync(id);
 
             existingResponse.Solutiondescription = response.Solutiondescription;

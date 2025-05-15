@@ -1,6 +1,8 @@
 @page "/operatorModal"
+@using BlazorBootstrap
 @using PGTech_io.Components.UI_Model
 @using PGTech_io.Controllers
+@using PGTech_io.Data
 @using PGTech_io.Domain.Enums
 @using PGTech_io.DTO
 @using PGTech_io.Models
@@ -16,7 +18,7 @@
     <BodyTemplate>
         <EditForm Model="@senderMessage" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
             <div class="input_box">
-                <label for="username">@userName</label>
+                <label for="username">@User.UserName</label>
             </div>
 
             <div class="input_box">
@@ -25,28 +27,26 @@
             </div>
 
             <div class="input_box">
-                <InputSelect @bind-Value="@senderMessage.Sector"> 
+                <label for="sector">Sectores</label>
+                <InputSelect id="sector" @bind-Value="@SelectedSectorId">
                     @foreach (Sector sector in @sectors)
                     {
-                        <input type="radio" name="sectorGroup" @value="@sector.Id" @bind="selectedSectorId" /> @sector.Name
+                        <option value="@sector.Id">@sector.Name</option>
                     }
                 </InputSelect>
             </div>
             
             <div class="input_box">
                 <tr>
-                    <InputRadioGroup @bind-Value="senderMessage.Subsector"> 
+                    <label for="sectores">Subsectores</label>
+                    <InputRadioGroup @bind-Value="SelectedSubsectorId" >
                         @foreach (Subsector subsector in subsectors) //check this
                         {
-                            <td><option value="@subsector.Id">@subsector.Name</option></td>
+                            <td><InputRadio Value="@subsector.Id"></InputRadio></td>
+                            <label>@subsector.Name</label>
                         }
                     </InputRadioGroup>
                 </tr>
-            </div>
-        
-            <div class="input_box">
-                <label for="OtroSubsector">Otro</label>
-                <InputText type="OtroSubsector" @bind-Value="senderMessage.Subsector" id="OtroSubsector" />
             </div>
 
             <div class="input_box">
@@ -69,40 +69,65 @@
     
 </Modal>
 
-
 @code {
-    
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
     [Parameter] public EventCallback onOperationCompleted { get; set; }
     [Parameter] public SenderDTO? senderMessage { get; set; } = new();
     
-    private int selectedSectorId { get; set; }
     private Modal? modalRef;
-    List<Sector> sectors = new();
-    List<Subsector> subsectors = new();
-    private string defineStatus = string.Empty;
-    private string userName = string.Empty;
-    private int selectedId = 0;
-    private bool isLoaded;
+    private List<Sector> sectors = new();
+    private List<Subsector> subsectors = new();
     
+    private int SelectedSectorId
+    {
+        get => selectedSectorId;
+        set
+        {
+            if (selectedSectorId != value)
+            {
+                selectedSectorId = value;
+                _ = OnSectorChange(value);
+            }
+        }
+    }
+    
+    private int SelectedSubsectorId
+    {
+        get => selectedSubsectorId;
+        set
+        {
+            if (selectedSubsectorId != value)
+            {
+                selectedSubsectorId = value;
+                _ = OnSubsectorChange(value);
+            }
+        }
+    }
+
+    private int selectedSectorId { get; set; }
+    private int selectedSubsectorId { get; set; }
+    private string _sectorId;
+    private string defineStatus = string.Empty;
+    private ApplicationUser? User;
     
     //------------------------------------------------------------------------------------------------------------------
 
-    public async Task OnShowOperatorModalClick(ModalParameters modalParameters)
+    public async Task OnShowModalClick(ModalParameters modalParameters)
     {
+        if (modalParameters.appUser is null || !modalParameters.isVisible) return;
+        
         IsUpdate = modalParameters.isUpdate;
-        senderMessage = modalParameters.messageType as SenderDTO;
         IsVisible = modalParameters.isVisible;
+        senderMessage = modalParameters.messageType as SenderDTO;
+        User = modalParameters.appUser;
         
-        if (!IsVisible) return;
-        
-        isLoaded = !isLoaded;
-        if (senderMessage != null) { selectedSolicitId(); }
-        senderMessage.Iduser = modalParameters.userId;
         defineStatus = IsUpdate ? "Update" : "Guardar";
-
-        setUserName();
+        
+        sectors = await SectorController.GetAllSectors();
+        
+        if (senderMessage != null)
+            senderMessage.Iduser = User.Id;
         
         await modalRef?.ShowAsync();
     }
@@ -116,24 +141,21 @@
     
     protected override async Task OnInitializedAsync()
     {
-        sectors = [
+        /*sectors = [
             new Sector("Fifo"), 
             new Sector("Tofu"),
             new Sector("Lifo")
         ]; 
+        */
+    }
+    
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) { } return Task.CompletedTask;
     }
     
     //------------------------------------------------------------------------------------------------------------------
-
-    private void selectedSolicitId()
-    {
-        selectedId = senderMessage.Id;
-    }
-
-    private async Task setUserName()
-    {
-        userName = await @UserService.UserName();
-    }
+    
 
     private async Task SelectOperation()
     {
@@ -158,7 +180,10 @@
     {
         //if (!ValidateData()) return;
         
-        if (senderMessage == null) senderMessage = new(); 
+        if (senderMessage == null) senderMessage = new SenderDTO();
+
+        senderMessage.Idsector = selectedSectorId;
+        senderMessage.Idsubsector = selectedSubsectorId;
         
         var sender = await SenderController.Post(senderMessage);
         
@@ -174,8 +199,11 @@
         //if (!ValidateData()) return;
         
         if (senderMessage == null) return;
+        
+        senderMessage.Idsector = selectedSectorId;
+        senderMessage.Idsubsector = selectedSubsectorId;
 
-        var response = await SenderController.Put(senderMessage, selectedId);
+        var response = await SenderController.Put(senderMessage, senderMessage.Id);
 
         if (response)
         {
@@ -196,9 +224,18 @@
         return true;
     }
 
-    private async Task SetSector(int sectorId) // SR check
+    private async Task OnSectorChange(int sectorId) // SR check
     {
-        selectedSectorId = sectorId;
-        subsectors = await SectorController.GetSubsectorsById(sectorId);
+        selectedSectorId = sectorId; //Validate Id Exist
+        subsectors = await SectorController.GetSubsectorsById(selectedSectorId);
+        Console.WriteLine($"Subsector count: " + subsectors.Count);
+        StateHasChanged();
+    }
+    
+    private async Task OnSubsectorChange(int subsectorId) // SR check
+    {
+        selectedSubsectorId = subsectorId;
+        Console.WriteLine($"Subsector Id: " + selectedSubsectorId);
+        StateHasChanged();
     }
 }

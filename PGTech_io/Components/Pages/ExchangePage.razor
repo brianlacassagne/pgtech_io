@@ -1,11 +1,18 @@
 ﻿@page "/solicitations"
+@using Microsoft.AspNetCore.Authorization
 @using PGTech_io.Controllers
 @using PGTech_io.Components.Modals
 @using PGTech_io.Components.UI_Model
+@using PGTech_io.Data
 @using PGTech_io.DTO
+@using PGTech_io.Models
+@using PGTech_io.Services
 @inject SenderController SenderController
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserService UserService
+@inject SectorController SectorController
 @rendermode InteractiveServer
+@attribute [Authorize]
 
 <PageTitle>Solicit</PageTitle>
 
@@ -28,7 +35,7 @@
         <DataTableColumn TModel="SenderDTO"
                          IsSortable="true"
                          IsFilterable="true"
-                         Property="(e) => e.UserName"
+                         Property="(e) => e.IdUserNavigation.UserName"     
                          CustomTitle="Usuario"/>
 
         <DataTableColumn TModel="SenderDTO"
@@ -40,13 +47,13 @@
         <DataTableColumn TModel="SenderDTO"
                          IsSortable="true"
                          IsFilterable="true"
-                         Property="(e) => e.Sector"
+                         Property="(e) => e.IdsectorNavigation.Name"
                          CustomTitle="Sector"/>
 
         <DataTableColumn TModel="SenderDTO"
                          IsSortable="true"
                          IsFilterable="true"
-                         Property="(e) => e.Subsector"
+                         Property="(e) => e.Idsubsector"
                          CustomTitle="Subsector"/>
 
         <DataTableColumn TModel="SenderDTO"
@@ -74,69 +81,73 @@
     </DataTable>
 }
 
-<!--
-<p>Answered: @ifAnswered</p>
 <p>SelectedRow: @selectedSender?.ToString()</p>
-<button class="btn btn-primary" @onclick="GetSolicitation">GetOne Solicitation (Once Please)</button>
-<button class="btn btn-primary" @onclick="CreateSolicitation">Solicit Test</button>
-<ResponseModal @ref="modalRes" IsUpdate="@isUpdate" Solicit="SelectedSolicitation" OnOperationCompleted="OnAfterModalOperation"></ResponseModal>
--->
 
-<button type="button" class="btn btn-primary" @onclick="UpsertRow">Upsert</button>
-<button type="button" class="btn btn-primary" @onclick="RespondRow">Responder</button>
-<button type="button" class="btn btn-primary" @onclick="ViewRow">Ver</button>
+<button type="button" class="btn btn-primary" @onclick="SendMessage">Enviar</button>
+<button type="button" class="btn btn-primary" @onclick="RespondMessage">Responder</button>
 
 <SenderModal @ref="modalSolicit" onOperationCompleted="OnAfterModalOperation"></SenderModal>
 <ResponseModal @ref="modalResponse" onOperationCompleted="OnAfterModalOperation"></ResponseModal>
-
-<AuthorizeView>
-    Hello @context.User.Identity?.Name!
-</AuthorizeView>
-
-<!--<AuthorizeView Roles="Admin">
-    <Authorized>
-        <ResponseModal @ref="modalResponse" OnOperationCompleted="OnAfterModalOperation"></ResponseModal>
-    </Authorized>
-    <NotAuthorized>
-        <p>Incorrect privileges</p>
-    </NotAuthorized>
-</AuthorizeView>-->
-
 <ViewModal @ref="modalView" OnOperationCompleted="OnAfterModalOperation"></ViewModal>
 
-<p>@dataInput</p>
+<AuthorizeView Roles="TECNICO">
+    <Authorized>
+        <button type="button" class="btn btn-primary" @onclick="SendMessage">Enviar</button>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="USUARIO">
+    <Authorized>
+        <button type="button" class="btn btn-primary" @onclick="RespondMessage">Responder</button>
+    </Authorized>
+</AuthorizeView>
+
+<button type="button" class="btn btn-primary" @onclick="ViewMessage">Ver</button>
 
 @code {
+    
     private SenderModal? modalSolicit;
     private ResponseModal? modalResponse;
     private ViewModal? modalView;
-    private bool isModalVisible = false;
+    
     private List<SenderDTO?> ListSolicitations { get; set; }
     private SenderDTO? selectedSender { get; set; } = new();
-    private string dataInput = "";
+    private ApplicationUser User { get; set; }
+    private string userId { get; set; }
+    
     private bool isVisible = false;
-    private bool isUpdate = false;
+    private bool isEntityUpdate = false;
     private bool showModal = false;
-    private string ifAnswered = "";
-    private string? userId = "";
     
     protected override async Task OnInitializedAsync()
     {
-        await setUser();
-        ListSolicitations = new List<SenderDTO?>(await SenderController.GetAll());
-        Console.Write($"Solicitations in List: {ListSolicitations.Count}");
+        await SetSessionedUserEntity();
+
+        if (!string.IsNullOrEmpty(User.Id))
+        {
+            ListSolicitations = new List<SenderDTO?>(await SenderController.GetAllByUserId(userId));
+            Console.Write($"Solicitations in List: {ListSolicitations.Count}");
+        }
+
         Console.Write($"UserId = {userId}");
     }
-
-    private async Task setUser()
+    
+    private async Task SetSessionedUserEntity()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        userId = await UserService.getSessionedUserId();
+        User = await @UserService.getUserByUserId(userId);
+    }
+
+    private async Task<string> GetSectorName(Sector e)
+    {
+        return await SectorController.Get(e.Id).;
         
-        if (@user.Identity is { IsAuthenticated: true })
-        {
-            userId = @user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        }
+        return Task.FromResult(e.Name);
+    }
+    
+    private Task<string> GetSubsectorName(int idsector)
+    {
+        return Task.FromResult(e.Name);
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -151,7 +162,9 @@
     
     private async Task OnAfterModalOperation()
     {
-        ListSolicitations = new List<SenderDTO?>(await SenderController.GetAll());
+        if (!string.IsNullOrEmpty(userId))
+            ListSolicitations = new List<SenderDTO?>(await SenderController.GetAllByUserId(userId));
+        
         StateHasChanged();
     }
     
@@ -161,8 +174,8 @@
         {
             if (modalSolicit is not null)
             {
-                var parameters = new ModalParameters(isUpdate, true, userId, selectedSender);
-                await modalSolicit.OnShowOperatorModalClick(parameters);
+                var parameters = new ModalParameters(isEntityUpdate, true, User, selectedSender);
+                await modalSolicit.OnShowModalClick(parameters);
             }
         }
         catch (InvalidOperationException ex)
@@ -179,7 +192,7 @@
         {
             if (modalResponse is not null)
             {
-                var parameters = new ModalParameters(false, true, userId, selectedSender);
+                var parameters = new ModalParameters(false, true, User, selectedSender);
                 await modalResponse.OnShowResponseModalClick(parameters);
             }
         }
@@ -197,7 +210,7 @@
         {
             if (modalView is not null)
             {
-                var parameters = new ModalParameters(false, true, userId, selectedSender);
+                var parameters = new ModalParameters(false, true, User, selectedSender);
                 await modalView.OnShowModalClick(parameters);
             }
         }
@@ -212,26 +225,34 @@
         if (!showModal && selectedSender != sender)
         {
             selectedSender = sender;
-            isUpdate = true;
-            Console.WriteLine("Selected Solicitation -> " + sender.ToString());
+            isEntityUpdate = true;
+            Console.WriteLine("Selected Solicitation -> " + sender);
             Console.WriteLine(sender.Client);
         }
     }
+
+    private async Task<Sector?> SetSector(SenderDTO sent)
+    {
+        if (sent != null && sent.Idsector != 0)
+        {
+            return sent.IdsectorNavigation;
+        }
+        return null;
+    }
     
-    
-    private async Task UpsertRow()
+    private async Task SendMessage()
     {
         await OpenSolicitModal();
         await Task.CompletedTask;
     }
     
-    private async Task RespondRow()
+    private async Task RespondMessage()
     {
         await OpenResponseModal();
         await Task.CompletedTask;
     }
     
-    private async Task ViewRow()
+    private async Task ViewMessage()
     {
         await OpenViewModal();
         await Task.CompletedTask;

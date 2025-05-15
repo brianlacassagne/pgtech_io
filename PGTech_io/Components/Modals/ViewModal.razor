@@ -1,4 +1,5 @@
 @page "/viewModal"
+@using BlazorBootstrap
 @using PGTech_io.Components.UI_Model
 @using PGTech_io.Controllers
 @using PGTech_io.Domain.Enums
@@ -6,6 +7,7 @@
 @using PGTech_io.Models
 @rendermode InteractiveServer
 @inject ResponseController ResponseController;
+@inject SectorController SectorController;
 
 <Modal @ref="modalRef" Title="@defineStatus" IsVerticallyCentered="true" Size="ModalSize.Large">
     <BodyTemplate>
@@ -21,30 +23,25 @@
         </div>
 
         <div class="input_box">
-            <label for="sectorA">SectorA</label>
-            <InputText type="checkbox" @bind-Value="existingSender.Sector"  id="sectorA" readonly/>
-            <label for="sectorB">SectorB</label>
-            <InputText type="checkbox" @bind-Value="existingSender.Sector"  id="sectorB" readonly/>
-        </div>
-
-        <div class="input_box">
-            <tr>
-                <InputRadioGroup @bind-Value="existingSender.Subsector">
-                    <td><InputRadio Value="SubsectorEnums.Subsector.TestA1"/> Subsector A1</td>
-                    <td><InputRadio Value="SubsectorEnums.Subsector.TestB1"/> Subsector A2</td>
-                    <td><InputRadio Value="SubsectorEnums.Subsector.TestC1"/> Subsector A3</td>
-                    <td><InputRadio Value="SubsectorEnums.Subsector.TestD1"/> Subsector A4</td>
-                </InputRadioGroup>
-            </tr>
+            <label for="sector">Sectores</label>
+            <InputSelect id="sector" @bind-Value="@existingSender.IdsectorNavigation">
+                @foreach (Sector sector in @sectors)
+                {
+                    <option value="@sector.Id" selected="@SetSubsectors(Convert.ToString(sector.Id))">@sector.Name</option>
+                }
+            </InputSelect>
         </div>
         
+        <!--
+            
         <div class="input_box">
             <tr>
+                <label for="sectores">Subsectores</label>
                 <InputRadioGroup @bind-Value="existingSender.Subsector">
-                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A1</td>
-                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestB2"/> Subsector A2</td>
-                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestC2"/> Subsector A3</td>
-                    <td><InputRadio Value="SubsectorEnums.SubsectorB.TestD2"/> Subsector A4</td>
+                    @foreach (Subsector subsector in subsectors) //check this
+                    {
+                        <td><InputRadio Value="@subsector.Id">@subsector.Name</InputRadio></td>
+                    }
                 </InputRadioGroup>
             </tr>
         </div>
@@ -53,6 +50,8 @@
             <label for="OtroSubsector">Otro</label>
             <InputText type="OtroSubsector" @bind-Value="existingSender.Subsector" id="OtroSubsector" readonly/>
         </div>
+        
+        -->
 
         <div class="input_box">
             <label for="problemDescription">Description del Problema</label>
@@ -97,6 +96,9 @@
     [Parameter] public SenderDTO? existingSender { get; set; } = new();
     
     Response? existingResponse { get; set; } = new();
+    List<Sector> sectors = new();
+    List<Subsector> subsectors = new();
+    
     private int selectedId = 0;
     private bool isLoaded;
     private string defineStatus = "Vista";
@@ -135,6 +137,7 @@
     
     protected override async Task OnInitializedAsync()
     {
+        // Input Subsectors
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -149,5 +152,14 @@
             existingResponse = response;
             IsUpdate = true;
         }
+        
     }
+    
+    private async Task SetSubsectors(string sectorId) // SR check
+    {
+        int id = Convert.ToInt32(sectorId);
+        subsectors = await SectorController.GetSubsectorsById(id);
+    }
+    
+    
 }

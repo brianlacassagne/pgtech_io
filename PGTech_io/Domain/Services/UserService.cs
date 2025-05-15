@@ -2,7 +2,6 @@ using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PGTech_io.Components.Constants;
 using PGTech_io.Data;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
@@ -20,14 +19,13 @@ public class UserService()
         _authenticationStateProvider = authenticationStateProvider;
     }
     
-    public async Task<string> obtainUserNameByUserId(string userId)
+    public async Task<ApplicationUser> getUserByUserId(string userId)
     {
         var result = await _userManager.FindByIdAsync(userId);
-        string? userName = result.UserName;
-        return userName.ToString();
+        return result;
     }
 
-    public async Task<string> UserName()
+    public async Task<string> getSessionedUserId()
     {
         var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;

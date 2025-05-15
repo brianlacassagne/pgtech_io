@@ -1,14 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Google.Cloud.Firestore;
+using PGTech_io.Data;
 
 namespace PGTech_io.DTO;
 
 [FirestoreData]
-public class UserDTO
+public class UserDTO : ApplicationUser
 {
-    public int Id { get; set; }
-    public string UserName { get; set; }
-    public string Email { get; set; }
-    public string? PhoneNumber { get; set; }
-    
 }

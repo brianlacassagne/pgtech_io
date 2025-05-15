@@ -12,4 +12,16 @@ public partial class Subsector
     public int Idsector { get; set; }
 
     public virtual Sector IdsectorNavigation { get; set; } = null!;
+    
+    public override bool Equals(object? obj)
+    {
+        return obj is Subsector s && s.Id == Id;
+    }
+
+    public override int GetHashCode()  => Id.GetHashCode();
+
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }

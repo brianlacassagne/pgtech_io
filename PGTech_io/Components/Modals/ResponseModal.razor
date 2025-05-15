@@ -1,6 +1,8 @@
 @page "/responseModal"
+@using BlazorBootstrap
 @using PGTech_io.Components.UI_Model
 @using PGTech_io.Controllers
+@using PGTech_io.Data
 @using PGTech_io.DTO
 @using PGTech_io.Models
 @using PGTech_io.Services
@@ -12,7 +14,7 @@
     <BodyTemplate>
         <EditForm Model="@existingResponse" OnValidSubmit="@SelectOperation" FormName="OperatorModal">
             <div class="input_box">
-                <label for="username">@userName</label>
+                <label for="username">@User</label>
             </div>
 
             <div class="input_box">
@@ -34,45 +36,44 @@
 </Modal>
 
 @code {
-    private Modal? modalRef;
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public bool IsUpdate { get; set; }
     [Parameter] public EventCallback onOperationCompleted { get; set; }
     [Parameter] public SenderDTO? senderMessage { get; set; } = new();
     
+    private Modal? modalRef;
     Response? existingResponse { get; set; } = new();
+    
     private int selectedId = 0;
-    private bool isLoaded;
+    
     private string defineStatus = "";
     private string titleString = "";
-    private string userName = "";
+    private ApplicationUser? User;
     
     //------------------------------------------------------------------------------------------------------------------
 
     public async Task OnShowResponseModalClick(ModalParameters modalParameters)
     {
+        if (modalParameters.appUser is null || !modalParameters.isVisible || modalParameters.messageType == null) return;
+        
         IsVisible = modalParameters.isVisible;
         IsUpdate = modalParameters.isUpdate;
         senderMessage = modalParameters.messageType as SenderDTO;
-        existingResponse = new();
-
-        if (!IsVisible || senderMessage == null) return;
+        User = modalParameters.appUser;
         
-        isLoaded = !isLoaded;
-        await AssignResponse();
-        existingResponse.Iduser = modalParameters.userId; // move to constructor
-        selectedId = senderMessage.Id;
+        await RetrieveExistingResponse();
+        
         defineStatus = IsUpdate ? "Update" : "Guardar";
         titleString = $"{senderMessage.Client} {defineStatus}"; //Add User later
-        
-        setUserName();
-        
+    
         await modalRef?.ShowAsync();
     }
 
-    private async Task AssignResponse()
+    private async Task RetrieveExistingResponse()
     {
-        var response = await ResponseController.GetBySolicitationId(selectedId);
+        if (senderMessage == null) return;
+        
+        var response = await ResponseController.GetBySolicitationId(senderMessage.Id);
         if (response == null) return;
         
         Console.WriteLine("Response for [" + senderMessage  + "] found, ID -> " + response);
@@ -90,7 +91,6 @@
     
     protected override async Task OnInitializedAsync()
     {
-        
     }
     
     //------------------------------------------------------------------------------------------------------------------
@@ -98,10 +98,15 @@
     private async Task SelectOperation()
     {
         Console.WriteLine("IsUpdate:" + IsUpdate);
-    
-        if (IsUpdate) await Update();
-        
-        else await Create();
+
+        if (IsUpdate)
+        {
+            await Update();
+        }
+        else
+        {
+            await Create();
+        }
 
         existingResponse = null;
         await OnHideModalClick();
@@ -113,7 +118,11 @@
     private async Task Create() //Move to Validations
     {
         //if (!ValidateData()) return;
+        
         if (senderMessage == null || existingResponse == null) return;
+        
+        Response newResponse = new();
+        newResponse.Iduser = User.Id; // move to constructor
         
         var response = await ResponseController.Post(existingResponse, senderMessage.Id);
         
@@ -136,11 +145,6 @@
         {
             Console.WriteLine("Response updated!");
         }
-    }
-    
-    private async Task setUserName()
-    {
-        userName = await @UserService.UserName();
     }
     
     //------------------------------------------------------------------------------------------------------------------

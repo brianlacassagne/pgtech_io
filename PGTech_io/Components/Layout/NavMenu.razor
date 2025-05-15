@@ -1,8 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using PGTech_io.Data
+@using PGTech_io.Services
 @implements IDisposable
 @attribute [Authorize]
 @inject NavigationManager NavigationManager
+@inject UserService UserService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -22,18 +24,24 @@
             </NavLink>
         </div>
         
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
-        </div>
-        
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="solicitations">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Solicitations
-            </NavLink>
-        </div>
+        @if (isVisible)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="solicitations">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Solicitations
+                </NavLink>
+            </div>
 
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="auth">
+                    <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
+                </NavLink>
+            </div>
+        }
+        
         <AuthorizeView>
                 
             <Authorized>
@@ -73,11 +81,25 @@
     private ApplicationUser user = default!;
     private string? username;
     private string? phoneNumber;
+    private bool isVisible = true;
 
-    protected override void OnInitialized()
+    protected async override void OnInitialized()
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.LocationChanged += OnLocationChanged;
+        try
+        {
+            currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            NavigationManager.LocationChanged += OnLocationChanged;
+            username = await UserService.getSessionedUserId();
+
+            if (string.IsNullOrEmpty(username))
+                isVisible = false; 
+        
+            Console.WriteLine($"Sessioned User: {username}");
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

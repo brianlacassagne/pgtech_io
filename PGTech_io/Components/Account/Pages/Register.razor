@@ -48,7 +48,7 @@
                 <option value="">Select Role</option>
                 @foreach (IdentityRole identityRole in IdentityRolesList)
                 {
-                    <option value="@identityRole.Id">@identityRole.Name</option>
+                    <option value="@identityRole.Id" selected="@selectedRole == @identityRole.Id">@identityRole.Name</option>
                 }
                 </InputSelect>
             </div>
@@ -70,7 +70,7 @@
 
     private List<IdentityRole> IdentityRolesList;
 
-    private string selectedRole;
+    private string selectedRole { get; set; }
 
     [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
 
@@ -85,13 +85,13 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
-        if (await RoleManager.FindByIdAsync(selectedRole) == null) return; // Abort if role does not exist
+        //if (await RoleManager.FindByIdAsync(selectedRole) == null) return; // Abort if role does not exist
         
         var user = CreateUser();
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-        await UserManager.AddToRoleAsync(user, "Usuario");
+        //await UserManager.AddToRoleAsync(user, "Usuario");
         var result = await UserManager.CreateAsync(user, Input.Password);
         
         if (!result.Succeeded)

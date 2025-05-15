@@ -1,7 +1,6 @@
 using AutoMapper;
 using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
-using PGTech_io.Components.Constants;
 using PGTech_io.DTO;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
@@ -28,11 +27,13 @@ public class SenderRepository : ISender
         
         try
         {
+            sender.Createdwhen = DateOnly.FromDateTime(DateTime.UtcNow);
+            
             Console.WriteLine($"HERE {sender.Client}");
             
-            var map = _mapper.Map<Sender>(sender);
+            var map = _mapper.Map<Send>(sender);
             
-            await _db.Solicits.AddAsync(map);
+            await _db.Sends.AddAsync(map);
             
             var saved = await _db.SaveChangesAsync() > 0;
             
@@ -56,7 +57,7 @@ public class SenderRepository : ISender
     {
         try
         {
-            var result = _db.Solicits.FirstOrDefault(x => x.Id == id);
+            var result = _db.Sends.FirstOrDefault(x => x.Id == id);
             
             var map = _mapper.Map<SenderDTO>(result);
             
@@ -74,8 +75,10 @@ public class SenderRepository : ISender
         var newList = new List<SenderDTO>();
         try
         {
-            var result = _db.Solicits
+            var result = _db.Sends
                 .Include(x => x.Responses)
+                .Include(x => x.IduserNavigation)
+                .Include(x => x.IdsectorNavigation)
                 .OrderByDescending(x => x.Createdwhen)
                 .ToList();
 
@@ -83,7 +86,43 @@ public class SenderRepository : ISender
             {
                 var map = _mapper.Map<SenderDTO>(sender);
                 if (!string.IsNullOrEmpty(Convert.ToString(sender.Iduser)))
-                    map.UserName = await _userService.obtainUserNameByUserId(sender.Iduser);
+                    map.IdUserNavigation = await _userService.getUserByUserId(sender.Iduser);
+                if (sender.Responses.Any())
+                    map.isAnswered = "Contestado";
+                
+                newList.Add(map);
+            }
+            
+            if (result.Count == 0)
+                Console.WriteLine("No solicitations were found.");
+            
+            return newList;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+    
+    public async Task<List<SenderDTO?>> GetAllByUserId(string userId)
+    {
+        var newList = new List<SenderDTO>();
+        try
+        {
+            var result = _db.Sends
+                .Where(x => x.Iduser == userId)
+                .Include(x => x.Responses)
+                .Include(x => x.IduserNavigation)
+                .Include(x => x.IdsectorNavigation)
+                .OrderByDescending(x => x.Createdwhen)
+                .ToList();
+
+            foreach (var sender in result)
+            {
+                var map = _mapper.Map<SenderDTO>(sender);
+                if (!string.IsNullOrEmpty(Convert.ToString(sender.Iduser)))
+                    map.IdUserNavigation = await _userService.getUserByUserId(sender.Iduser);
                 if (sender.Responses.Any())
                     map.isAnswered = "Contestado";
                 
@@ -108,15 +147,17 @@ public class SenderRepository : ISender
 
         try
         {
-            var exitingSolicitation = await _db.Solicits.FindAsync(id);
+            sender.Updatedwhen = DateOnly.FromDateTime(DateTime.UtcNow);
             
-            exitingSolicitation.Client = sender.Client;
-            exitingSolicitation.Sector = sender.Sector;
-            exitingSolicitation.Subsector = sender.Subsector;
-            exitingSolicitation.Problemdescription = sender.Problemdescription;
-            exitingSolicitation.Updatedwhen = sender.Updatedwhen;
+            var existingSend = await _db.Sends.FindAsync(id);
             
-            _db.Solicits.Update(exitingSolicitation);
+            existingSend.Client = sender.Client;
+            existingSend.Idsector = sender.Idsector;
+            existingSend.IdSubsector = sender.Idsubsector;
+            existingSend.Problemdescription = sender.Problemdescription;
+            existingSend.Updatedwhen = sender.Updatedwhen;
+            
+            _db.Sends.Update(existingSend);
             
             var saved = await _db.SaveChangesAsync() > 0;
             
@@ -142,9 +183,9 @@ public class SenderRepository : ISender
         
         try
         {
-            var map = _mapper.Map<Sender>(sender);
+            var map = _mapper.Map<Send>(sender);
             
-           _db.Solicits.Remove(map);
+           _db.Sends.Remove(map);
            
            var saved = await _db.SaveChangesAsync() > 0;
            

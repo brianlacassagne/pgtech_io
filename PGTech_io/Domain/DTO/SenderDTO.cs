@@ -1,4 +1,5 @@
 using System.Reflection.Metadata;
+using PGTech_io.Data;
 using PGTech_io.Interfaces;
 using PGTech_io.Models;
 
@@ -8,10 +9,11 @@ public class SenderDTO : IMessageType
 {
     public int Id { get; set; }
     public string? Iduser { get; set; } 
-    public string? UserName { get; set; }
+    public int Idsector { get; set; }
+    public int Idsubsector { get; set; }
+    public ApplicationUser? IdUserNavigation { get; set; }
     public string? Client { get; set; }
-    public string? Sector { get; set; }
-    public string? Subsector { get; set; }
+    public Sector? IdsectorNavigation { get; set; }
     public string? Problemdescription { get; set; }
     public DateOnly Createdwhen { get; set; }
     public DateOnly? Updatedwhen { get; set; }
@@ -19,6 +21,6 @@ public class SenderDTO : IMessageType
     
     public override string ToString()
     {
-        return $"{Id} {UserName} {Client}";
+        return $"{IdUserNavigation} {Client} {IdsectorNavigation} {Problemdescription}";
     }
 }

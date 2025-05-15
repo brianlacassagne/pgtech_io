@@ -190,7 +190,7 @@ namespace PGTech_io.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Solicits",
+                name: "Sends",
                 schema: "identity",
                 columns: table => new
                 {
@@ -198,15 +198,22 @@ namespace PGTech_io.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn),
                     client = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     iduser = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    sector = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Idsector = table.Column<int>(type: "integer", nullable: false),
                     subsector = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     problemdescription = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     createdwhen = table.Column<DateOnly>(type: "date", nullable: false),
-                    updatedwhen = table.Column<DateOnly>(type: "date", nullable: true)
+                    updatedwhen = table.Column<DateOnly>(type: "date", nullable: true),
+                    IdsectorNavigationId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("Solicits_pkey", x => x.id);
+                    table.PrimaryKey("Sends_pkey", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Sends_Sectors_IdsectorNavigationId",
+                        column: x => x.IdsectorNavigationId,
+                        principalSchema: "identity",
+                        principalTable: "Sectors",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_user",
                         column: x => x.iduser,
@@ -261,7 +268,7 @@ namespace PGTech_io.Migrations
                         name: "fk_solicit",
                         column: x => x.idsolicitation,
                         principalSchema: "identity",
-                        principalTable: "Solicits",
+                        principalTable: "Sends",
                         principalColumn: "id");
                 });
 
@@ -285,7 +292,7 @@ namespace PGTech_io.Migrations
                         name: "fk_solicit",
                         column: x => x.idsolicitation,
                         principalSchema: "identity",
-                        principalTable: "Solicits",
+                        principalTable: "Sends",
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_user",
@@ -301,7 +308,7 @@ namespace PGTech_io.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Admin", null, "Admin", "ADMIN" },
+                    { "Tecnico", null, "Tecnico", "TECNICO" },
                     { "Usuario", null, "Usuario", "USUARIO" }
                 });
 
@@ -368,9 +375,15 @@ namespace PGTech_io.Migrations
                 column: "iduser");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Solicits_iduser",
+                name: "IX_Sends_IdsectorNavigationId",
                 schema: "identity",
-                table: "Solicits",
+                table: "Sends",
+                column: "IdsectorNavigationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sends_iduser",
+                schema: "identity",
+                table: "Sends",
                 column: "iduser");
 
             migrationBuilder.CreateIndex(
@@ -420,7 +433,7 @@ namespace PGTech_io.Migrations
                 schema: "identity");
 
             migrationBuilder.DropTable(
-                name: "Solicits",
+                name: "Sends",
                 schema: "identity");
 
             migrationBuilder.DropTable(
